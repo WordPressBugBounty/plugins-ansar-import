@@ -142,7 +142,6 @@ jQuery(document).ready(function ($) {
         var customize = jQuery(this).closest(".uk-modal-dialog").find('.import-option-list #import-customizer').prop("checked");
         var widget = jQuery(this).closest(".uk-modal-dialog").find('.import-option-list #import-widgets').prop("checked");
         var content = jQuery(this).closest(".uk-modal-dialog").find('.import-option-list #import-content').prop("checked");
-        console.log([customize, widget, content]);
         var data = {
             'action': 'import_action',
             'theme_id': theme_id,

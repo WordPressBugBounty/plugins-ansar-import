@@ -13,21 +13,17 @@ class ANS_WXR_Parser_SimpleXML {
 	function parse( $file ) {
 		$authors = $posts = $categories = $tags = $terms = array();
 
-		$internal_errors = libxml_use_internal_errors(true);
+        $internalErrors = libxml_use_internal_errors(true);
 
-		$dom = new DOMDocument;
-		$old_value = null;
-		if ( function_exists( 'libxml_disable_entity_loader' ) ) {
-			$old_value = libxml_disable_entity_loader( true );
-		}
-		$success = $dom->loadXML( file_get_contents( $file ) );
-		if ( ! is_null( $old_value ) ) {
-			libxml_disable_entity_loader( $old_value );
-		}
+        $dom = new DOMDocument;
+        $success = $dom->loadXML(file_get_contents($file), LIBXML_COMPACT | LIBXML_NOENT);
 
-		if ( ! $success || isset( $dom->doctype ) ) {
-			return new WP_Error( 'SimpleXML_parse_error', __( 'There was an error when reading this WXR file', 'ansar-import' ), libxml_get_errors() );
-		}
+        if (!$success || isset($dom->doctype)) {
+            return new WP_Error('SimpleXML_parse_error', __('There was an error when reading this WXR file', 'ansar-import'), libxml_get_errors());
+        }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
 
 		$xml = simplexml_import_dom( $dom );
 		unset( $dom );

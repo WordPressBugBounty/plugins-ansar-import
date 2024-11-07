@@ -32,7 +32,7 @@ class Ansar_Import_Activator {
     public static function activate() {
         $tehme_data = wp_get_theme();
         if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 'Themeansar' ) {
-            echo '<h3>' . __('Ansar Import - This plugin requires Official <a href="https://themeansar.com/">Theme Ansar</a> Theme to be activated to work.', 'ansar-import') . '</h3>';
+            echo '<h3>' . wp_kses_post(__('Ansar Import - This plugin requires Official <a href="https://themeansar.com/">Theme Ansar</a> Theme to be activated to work.', 'ansar-import')) . '</h3>';
 
             //Adding @ before will prevent XDebug output
             @trigger_error(esc_html__('Ansar Import - This plugin requires Official Theme Ansar Theme to be activated to work.', 'ansar-import'), E_USER_ERROR);

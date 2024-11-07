@@ -32,15 +32,16 @@ class ANS_WXR_Parser {
 		if ( isset($result) && defined('IMPORT_DEBUG') && IMPORT_DEBUG ) {
 			echo '<pre>';
 			if ( 'SimpleXML_parse_error' == $result->get_error_code() ) {
-				foreach  ( $result->get_error_data() as $error )
-					echo $error->line . ':' . $error->column . ' ' . esc_html( $error->message ) . "\n";
+				foreach  ( $result->get_error_data() as $error ) {
+					echo esc_html( $error->line ) . ':' . esc_html( $error->column ) . ' ' . esc_html( $error->message ) . "\n";
+				}
 			} else if ( 'XML_parse_error' == $result->get_error_code() ) {
 				$error = $result->get_error_data();
-				echo $error[0] . ':' . $error[1] . ' ' . esc_html( $error[2] );
+				echo esc_html( $error[0] ) . ':' . esc_html( $error[1] ) . ' ' . esc_html( $error[2] );
 			}
 			echo '</pre>';
-			echo '<p><strong>' . __( 'There was an error when reading this WXR file', 'ansar-import' ) . '</strong><br />';
-			echo __( 'Details are shown above. The importer will now try again with a different parser...', 'ansar-import' ) . '</p>';
+			echo '<p><strong>' . esc_html__( 'There was an error when reading this WXR file', 'ansar-import' ) . '</strong><br />';
+			echo esc_html__( 'Details are shown above. The importer will now try again with a different parser...', 'ansar-import' ) . '</p>';
 		}
 
 		// use regular expressions if nothing else available or this is bad XML

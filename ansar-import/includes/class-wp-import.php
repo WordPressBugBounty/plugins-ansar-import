@@ -172,6 +172,7 @@ class ANS_WP_Import extends WP_Importer {
         $this->version = $import_data['version'];
         if ($this->version > $this->max_wxr_version) {
             echo '<div class="error"><p><strong>';
+            // Translators: %s is the version of the WXR file.
             printf(esc_html__('This WXR file (version %s) may not be supported by this version of the importer. Please consider updating.', 'ansar-import'), esc_html($import_data['version']));
             echo '</strong></p></div>';
         }
@@ -197,6 +198,7 @@ class ANS_WP_Import extends WP_Importer {
             foreach ($import_data['posts'] as $post) {
                 $login = sanitize_user($post['post_author'], true);
                 if (empty($login)) {
+                    // Translators: %s is name of the author whose import failed.
                     printf(esc_html__('Failed to import author %s. Their posts will be attributed to the current user.', 'ansar-import'), esc_html($post['post_author']));
                     echo '<br />';
                     continue;
@@ -226,6 +228,7 @@ class ANS_WP_Import extends WP_Importer {
                 <h3><?php esc_html_e('Assign Authors', 'ansar-import'); ?></h3>
                 <p><?php esc_html_e('To make it simpler for you to edit and save the imported content, you may want to reassign the author of the imported item to an existing user of this site, such as your primary administrator account.', 'ansar-import'); ?></p>
                 <?php if ($this->allow_create_users()) : ?>
+                    <?php // Translators: %s is the default user role assigned to a newly created user. ?>
                     <p><?php printf(esc_html__('If a new user is created by WordPress, a new password will be randomly generated and the new user&#8217;s role will be set as %s. Manually changing the new user&#8217;s details will be necessary.', 'ansar-import'), esc_html(get_option('default_role'))); ?></p>
                 <?php endif; ?>
                 <ol id="authors">
@@ -294,7 +297,7 @@ class ANS_WP_Import extends WP_Importer {
                 'name'              => "user_map[$n_sanitized]",
                 'id'                => 'imported_authors_' . $n_sanitized,
                 'multi'             => true,
-                'show_option_all'   => esc_html__('- Select -', 'ananta-sites'),
+                'show_option_all'   => esc_html__('- Select -', 'ansar-import'),
                 'show'              => 'display_name_with_login',
                 'echo'              => false,
             )
@@ -350,9 +353,10 @@ class ANS_WP_Import extends WP_Importer {
                 if (isset($cat['term_id']))
                     $this->processed_terms[intval($cat['term_id'])] = $id;
             } else {
+                // Translators: %s is the name (nicename) of the category that failed to import.
                 printf(esc_html__('Failed to import category %s', 'ansar-import'), esc_html($cat['category_nicename']));
                 if (defined('IMPORT_DEBUG') && IMPORT_DEBUG)
-                    echo ': ' . ($id->get_error_message());
+                    echo ': ' . esc_html($id->get_error_message());
                 echo '<br />';
                 continue;
             }
@@ -396,9 +400,10 @@ class ANS_WP_Import extends WP_Importer {
                 if (isset($tag['term_id']))
                     $this->processed_terms[intval($tag['term_id'])] = $id['term_id'];
             } else {
+                // Translators: %s is the name of the post tag that failed to import.
                 printf(esc_html__('Failed to import post tag %s', 'ansar-import'), esc_html($tag['tag_name']));
                 if (defined('IMPORT_DEBUG') && IMPORT_DEBUG)
-                    echo ': ' . $id->get_error_message();
+                    echo ': ' . esc_html($id->get_error_message());
                 echo '<br />';
                 continue;
             }
@@ -452,9 +457,10 @@ class ANS_WP_Import extends WP_Importer {
                 if (isset($term['term_id']))
                     $this->processed_terms[intval($term['term_id'])] = $id['term_id'];
             } else {
-                printf(esc_html__('Failed to import %s %s', 'ansar-import'), esc_html($term['term_taxonomy']), esc_html($term['term_name']));
+                // Translators: 1: is the taxonomy type (e.g., category, tag), 2: is the name of the term that failed to import.
+                printf(esc_html__('Failed to import %1$s %2$s', 'ansar-import'), esc_html($term['term_taxonomy']), esc_html($term['term_name']));
                 if (defined('IMPORT_DEBUG') && IMPORT_DEBUG)
-                    echo ': ' . $id->get_error_message();
+                    echo ': ' . esc_html($id->get_error_message());
                 echo '<br />';
                 continue;
             }
@@ -545,7 +551,8 @@ class ANS_WP_Import extends WP_Importer {
             $post = apply_filters('wp_import_post_data_raw', $post);
 
             if (!post_type_exists($post['post_type'])) {
-                printf(esc_html__('Failed to import &#8220;%s&#8221;: Invalid post type %s', 'ansar-import'), esc_html($post['post_title']), esc_html($post['post_type']));
+                // Translators: 1: is the title of the post that failed to import, 2: is the invalid post type.
+                printf(esc_html__('Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s', 'ansar-import'), esc_html($post['post_title']), esc_html($post['post_type']));
                 echo '<br />';
                 do_action('wp_import_post_exists', $post);
                 continue;
@@ -581,7 +588,8 @@ class ANS_WP_Import extends WP_Importer {
             $post_exists = apply_filters('wp_import_existing_post', $post_exists, $post);
 
             if ($post_exists && get_post_type($post_exists) == $post['post_type']) {
-                printf(esc_html__('%s &#8220;%s&#8221; already exists.', 'ansar-import'), esc_html($post_type_object->labels->singular_name), esc_html($post['post_title']));
+                // Translators: 1: is the singular name of the post type (e.g., "Post", "Page"), 2: is the title of the post that already exists.
+                printf(esc_html__('%1$s &#8220;%2$s&#8221; already exists.', 'ansar-import'), esc_html($post_type_object->labels->singular_name), esc_html($post['post_title']));
                 echo '<br />';
                 $comment_post_ID = $post_id = $post_exists;
                 $this->processed_posts[intval($post['post_id'])] = intval($post_exists);
@@ -643,9 +651,10 @@ class ANS_WP_Import extends WP_Importer {
                 }
 
                 if (is_wp_error($post_id)) {
-                    printf(esc_html__('Failed to import %s &#8220;%s&#8221;', 'ansar-import'),  esc_html($post_type_object->labels->singular_name), esc_html($post['post_title']));
+                    // Translators: 1: is the singular name of the post type (e.g., "Post", "Page"), 2: is the title of the post that failed to import.
+                    printf(esc_html__('Failed to import %1$s &#8220;%2$s&#8221;', 'ansar-import'),  esc_html($post_type_object->labels->singular_name), esc_html($post['post_title']));
                     if (defined('IMPORT_DEBUG') && IMPORT_DEBUG)
-                        echo ': ' . $post_id->get_error_message();
+                        echo ': ' . wp_kses_post($post_id->get_error_message());
                     echo '<br />';
                     continue;
                 }
@@ -676,9 +685,10 @@ class ANS_WP_Import extends WP_Importer {
                             $term_id = $t['term_id'];
                             do_action('wp_import_insert_term', $t, $term, $post_id, $post);
                         } else {
-                            printf(esc_html__('Failed to import %s %s', 'ansar-import'), esc_html($taxonomy), esc_html($term['name']));
+                            // Translators: 1: is the taxonomy type (e.g., "category", "tag"), 2: is the name of the term that failed to import.
+                            printf(esc_html__('Failed to import %1$s %2$s', 'ansar-import'), esc_html($taxonomy), esc_html($term['name']));
                             if (defined('IMPORT_DEBUG') && IMPORT_DEBUG)
-                                echo ': ' . $t->get_error_message();
+                                echo ': ' . esc_html($t->get_error_message());
                             echo '<br />';
                             do_action('wp_import_insert_term_failed', $t, $term, $post_id, $post);
                             continue;
@@ -823,6 +833,7 @@ class ANS_WP_Import extends WP_Importer {
 
         $menu_id = term_exists($menu_slug, 'nav_menu');
         if (!$menu_id) {
+            // Translators: %s is the invalid menu slug that caused the menu item to be skipped.
             printf(esc_html__('Menu item skipped due to invalid menu slug: %s', 'ansar-import'), esc_html($menu_slug));
             echo '<br />';
             return;
@@ -996,6 +1007,7 @@ class ANS_WP_Import extends WP_Importer {
         $max_size = (int) $this->max_attachment_size();
         if (!empty($max_size) && $filesize > $max_size) {
             @unlink($tmp_file_name);
+            // Translators: %s is the maximum allowed size for the remote file.
             return new WP_Error('import_file_error', sprintf(esc_html__('Remote file is too large, limit is %s', 'ansar-import'), size_format($max_size)));
         }
 
@@ -1087,6 +1099,7 @@ class ANS_WP_Import extends WP_Importer {
                 $local_parent_id = $this->processed_posts[$parent_id];
 
             if ($local_child_id && $local_parent_id) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
                 $wpdb->update($wpdb->posts, array('post_parent' => $local_parent_id), array('ID' => $local_child_id), '%d', '%d');
                 clean_post_cache($local_child_id);
             }
@@ -1120,8 +1133,10 @@ class ANS_WP_Import extends WP_Importer {
 
         foreach ($this->url_remap as $from_url => $to_url) {
             // remap urls in post_content
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)", $from_url, $to_url));
             // remap enclosure urls
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $result = $wpdb->query($wpdb->prepare("UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key='enclosure'", $from_url, $to_url));
         }
     }
@@ -1162,6 +1177,7 @@ class ANS_WP_Import extends WP_Importer {
         if (isset($updates[$basename])) {
             $update = $updates[$basename];
             echo '<div class="error"><p><strong>';
+            // Translators: %s is the new version number of the importer that is available for update.
             printf(esc_html__('A new version of this importer is available. Please update to version %s to ensure compatibility with newer export files.', 'ansar-import'), esc_html($update->update->new_version));
             echo '</strong></p></div>';
         }

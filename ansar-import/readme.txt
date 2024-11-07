@@ -2,8 +2,8 @@
 Contributors: Themeansar
 Tags: theme demos, demo, importer, one click import
 Requires at least: 4.7
-Tested up to: 6.5.2
-Stable tag: 1.0.16
+Tested up to: 6.6
+Stable tag: 1.0.18
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -106,3 +106,9 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 1.0.16 - 17-04-2023 =
 * Fixed child theme import issue.
+
+= 1.0.17 - 18-09-2023 =
+* Fixed wp and php description issue.
+
+= 1.0.18 - 06-11-2024 =
+* Fixed security issue.

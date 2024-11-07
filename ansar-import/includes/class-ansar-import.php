@@ -198,10 +198,18 @@ class Ansar_Import {
         }
 
         //remove current home page if exsist
-        $home_d = get_page_by_title('Home');
-        if (isset($home_d)) {
-            wp_delete_post($home_d, true);
-            unset($home_d);
+        $home_d = get_posts(
+            array(
+                'post_type'      => 'page',
+                'post_title'     => 'Home',
+                'post_status'    => 'any',
+                'numberposts'    => 1,
+            )
+        );
+        
+        if (!empty($home_d)) {
+            $home_id = $home_d[0]->ID;
+            wp_delete_post($home_id, true);
         }
         
         // File exists?
@@ -546,7 +554,7 @@ class Ansar_Import {
 
                 // Result for widget instance
                 $results[$sidebar_id]['widgets'][$widget_instance_id]['name'] = isset($available_widgets[$id_base]['name']) ? $available_widgets[$id_base]['name'] : $id_base; // Widget name or ID if name not available (not supported by site).
-                $results[$sidebar_id]['widgets'][$widget_instance_id]['title'] = !empty($widget['title']) ? $widget['title'] : esc_html__('No Title', 'widget-importer-exporter'); // Show "No Title" if widget instance is untitled.
+                $results[$sidebar_id]['widgets'][$widget_instance_id]['title'] = !empty($widget['title']) ? $widget['title'] : esc_html__('No Title', 'ansar-import'); // Show "No Title" if widget instance is untitled.
                 $results[$sidebar_id]['widgets'][$widget_instance_id]['message_type'] = $widget_message_type;
                 $results[$sidebar_id]['widgets'][$widget_instance_id]['message'] = $widget_message;
             }
@@ -613,18 +621,19 @@ class Ansar_Import {
         set_theme_mod('nav_menu_locations', $locations);
 
         // echo 'Seting Home and Blog page . .<br>';
+        // Get "Home" page by its path
+        $home_page = get_page_by_path('home');
 
-        $homepage = get_page_by_title('Home');
-
-        if ($homepage) {
-            update_option('page_on_front', $homepage->ID);
+        if ($home_page) {
+            update_option('page_on_front', $home_page->ID);
             update_option('show_on_front', 'page');
         }
 
-        $blogpage = get_page_by_title('Blog');
+        // Get "Blog" page by its path
+        $blog_page = get_page_by_path('blog');
 
-        if ($blogpage) {
-            update_option('page_for_posts', $blogpage->ID);
+        if ($blog_page) {
+            update_option('page_for_posts', $blog_page->ID);
         }
     }
 

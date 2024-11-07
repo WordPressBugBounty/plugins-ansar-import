@@ -14,7 +14,7 @@
 <?php $tehme_data = wp_get_theme();
 
 if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 'Themeansar') {
-    echo '<h3>' . __('Ansar Import - This plugin requires Official <a href="https://themeansar.com/">Theme Ansar</a> Theme to be activated to work.', 'ansar-import') . '</h3>';
+    echo '<h3>' . wp_kses_post(__('Ansar Import - This plugin requires Official <a href="https://themeansar.com/">Theme Ansar</a> Theme to be activated to work.', 'ansar-import')) . '</h3>';
 
     //Adding @ before will prevent XDebug output
     @trigger_error(esc_html__('Ansar Import - This plugin requires Official Theme Ansar Theme to be activated to work.', 'ansar-import'), E_USER_ERROR);
@@ -118,7 +118,7 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
                                     <?php } ?>
                                     <img src="<?php echo esc_url($demo['preview_url']); ?>" >
                                 </div>
-                                <span class="more-details btn-preview" data-id="<?php echo absint($demo['id']); ?>" data-live="<?php  if(get_option( 'ansar_demo_installed' )== $demo['id']){ echo 1; }?>" data-toggle="modal" data-target="#AnsardemoPreview"><?php esc_html_e('Preview','ansr-import'); ?></span>
+                                <span class="more-details btn-preview" data-id="<?php echo absint($demo['id']); ?>" data-live="<?php  if(get_option( 'ansar_demo_installed' )== $demo['id']){ echo 1; }?>" data-toggle="modal" data-target="#AnsardemoPreview"><?php esc_html_e('Preview','ansar-import'); ?></span>
                                 <div class="theme-author"><?php esc_html_e('By Themeansar','ansar-import'); ?> </div>
                                 <div class="theme-id-container">
                                     <h2 class="theme-name" id=""><?php echo esc_attr($demo['title']['rendered']); ?></h2>
