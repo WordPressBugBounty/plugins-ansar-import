@@ -130,7 +130,10 @@ class Ansar_Import_Admin {
         $theme_slug = $theme_data->get('TextDomain');
         wp_localize_script($this->plugin_name, 'my_ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('check-sec'), 'theme_name' => $theme_name));
 
-        $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/?search=%27" . urlencode($theme_name) . "%27"));
+        $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/?orderby=menu_order&order=asc&search=%27" . urlencode($theme_name) . "%27&per_page=50"),
+        array(
+            'timeout'     => 20,
+        ));
         $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
         $all_demos = json_decode($theme_data_api_body, TRUE);
 

@@ -178,7 +178,10 @@ class Ansar_Import {
         if (!is_dir($upload_dir)) { mkdir($upload_dir, 0755); }
 
         //Getting demo data
-        $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/" . $theme_id));
+        $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/" . $theme_id),
+        array(
+            'timeout'     => 20,
+        ));
         $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
         $theme_data_api = json_decode($theme_data_api_body, TRUE);
         

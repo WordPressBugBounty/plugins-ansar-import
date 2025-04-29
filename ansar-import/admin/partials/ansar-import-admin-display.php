@@ -37,7 +37,10 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
 
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
     <?php
-    $cat_data = wp_remote_get(esc_url_raw('https://demos.themeansar.com/wp-json/wp/v2/categories'));
+    $cat_data = wp_remote_get(esc_url_raw('https://demos.themeansar.com/wp-json/wp/v2/categories'),
+	array(
+		'timeout'     => 20,
+	));
     $cat_data_body = wp_remote_retrieve_body($cat_data);
     $all_categories = json_decode($cat_data_body, TRUE);
 
@@ -47,7 +50,10 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
     $theme_name = $theme_data->get('Name');
     $theme_slug = $theme_data->get('TextDomain');
 
-    $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/?orderby=menu_order&order=asc&search=%27" . urlencode($theme_name) . "%27&per_page=50"));
+    $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/?orderby=menu_order&order=asc&search=%27" . urlencode($theme_name) . "%27&per_page=50"),
+	array(
+		'timeout'     => 20,
+	));
 
     $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
     $all_demos = json_decode($theme_data_api_body, TRUE);

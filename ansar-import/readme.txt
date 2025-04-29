@@ -1,9 +1,11 @@
 === Ansar Import ===
 Contributors: Themeansar
-Tags: theme demos, demo, importer, one click import
-Requires at least: 4.7
-Tested up to: 6.6
-Stable tag: 1.0.18
+Tags: theme demos, demo, importer, one click import, readymate web temeplate
+Requires at least: 6.6
+Requires PHP: 7.4
+Tested up to: 6.8
+Stable tag: 1.0.19
+Version: 1.0.19
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,7 +17,7 @@ Import <a href="https://themeansar.com/" target="_blank" rel="nofollow">Themeans
 
 = Requirements =
 
-* WordPress 4.7 or later.
+* WordPress 5.4 or later.
 * [Themeansar Themes](https://themeansar.com/)
 
 
@@ -104,11 +106,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.0.15 - 18-09-2023 =
 * Fixed demo page issue.
 
-= 1.0.16 - 17-04-2023 =
+= 1.0.16 - 17-04-2024 =
 * Fixed child theme import issue.
 
-= 1.0.17 - 18-09-2023 =
-* Fixed wp and php description issue.
+= 1.0.17 - 18-09-2024 =
+* Fixed wp and php deprecation issue.
 
 = 1.0.18 - 06-11-2024 =
 * Fixed security issue.
+
+= 1.0.19 - 29-04-2025 =
+* Fixed Demo Preview Issue.
+* Fixed Demo Load Issue.

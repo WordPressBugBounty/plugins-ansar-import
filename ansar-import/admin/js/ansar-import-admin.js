@@ -34,7 +34,7 @@ jQuery(document).ready(function ($) {
 
     // console.log(ansar_theme_object[0]);
 
-// Product Show Method
+    // Product Show Method
     jQuery("#product_filter a").click(function (e) {
         e.preventDefault();
         jQuery(this).tab('show');
@@ -58,20 +58,15 @@ jQuery(document).ready(function ($) {
                     jQuery(".preview-buy").removeClass('uk-hidden');
                     jQuery(".preview-buy").attr('src', ansar_theme_object[i].pro_link);
                 }
-
             }
-
         }
         if (jQuery(this).data('live') === 1) {
             jQuery(".import-priview").addClass('uk-hidden');
             jQuery(".preview-live-btn").removeClass('uk-hidden');
         }
-
-
         UIkit.modal('#AnsardemoPreview').show();
 
     });
-
 
     jQuery(".preview-desktop").click(function ($) {
         jQuery(".wp-full-overlay-main").removeClass('p-mobile');
@@ -88,30 +83,22 @@ jQuery(document).ready(function ($) {
 
     jQuery(".collapse-sidebar").click(function ($) {
 
-
         var x = jQuery(this).attr("aria-expanded");
-        if (x === "true")
-        {
+        if (x === "true") {
             jQuery(this).attr("aria-expanded", "false");
             jQuery(".theme-install-overlay").addClass('expanded').removeClass('collapsed');
         } else {
             jQuery(this).attr("aria-expanded", "true");
             jQuery(".theme-install-overlay").addClass('collapsed').removeClass('expanded');
         }
-
-
-
-
-
-        // jQuery(this).attr("aria-expanded","false");
-        //  jQuery(".theme-install-overlay").addClass('collapsed').removeClass('expanded');
-
     });
 
 
     jQuery(".close-full-overlay").click(function () {
 
         UIkit.modal('#AnsardemoPreview').hide();
+        jQuery("#theme_preview").attr('src', '');
+        jQuery(".theme-screenshot").attr('src', '');
 
     });
 
@@ -131,8 +118,6 @@ jQuery(document).ready(function ($) {
             jQuery('.theme').removeClass("focus");
         }
     });
-
-
 
     jQuery("#import_data").on("click", function ($) {
         var theme_id = jQuery("#theme_id").val();
@@ -165,17 +150,7 @@ jQuery(document).ready(function ($) {
                 alert(data);
                 console.log(data);
             }
-
         });
         return false;
-
     });
-
-
-
-
 });
-
-
-
-
