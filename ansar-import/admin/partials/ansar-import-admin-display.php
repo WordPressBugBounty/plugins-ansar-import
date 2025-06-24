@@ -37,10 +37,7 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
 
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
     <?php
-    $cat_data = wp_remote_get(esc_url_raw('https://demos.themeansar.com/wp-json/wp/v2/categories'),
-	array(
-		'timeout'     => 20,
-	));
+    $cat_data = wp_remote_get(esc_url_raw('https://api.themeansar.com/wp-json/wp/v2/categories?_fields=id,name,slug&post_type=demos&per_page=50&exclude=1'), [ 'timeout' => 15 ]);
     $cat_data_body = wp_remote_retrieve_body($cat_data);
     $all_categories = json_decode($cat_data_body, TRUE);
 
@@ -49,18 +46,14 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
     $theme_data = wp_get_theme();
     $theme_name = $theme_data->get('Name');
     $theme_slug = $theme_data->get('TextDomain');
-
-    $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/?orderby=menu_order&order=asc&search=%27" . urlencode($theme_name) . "%27&per_page=50"),
-	array(
-		'timeout'     => 20,
-	));
+    
+    $theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/?orderby=menu_order&order=asc&search=%27" . urlencode($theme_name) . "%27&per_page=50"), [ 'timeout' => 15 ]);
 
     $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
     $all_demos = json_decode($theme_data_api_body, TRUE);
 
     $present_cat = array();
     $present_cat = array_values(array_unique($present_cat));
-
 
     if (count($all_demos) == 0) {
         wp_die('This theme is not supported yet!');
@@ -224,36 +217,41 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
 </div>
 <!-- Modal preview  End -->
 
-<div id="Confirm" uk-modal>
-    <div class="uk-modal-dialog">
-        <button class="uk-modal-close-default" type="button" uk-close></button>
-        <div class="uk-modal-header">
-            <h2 class="uk-modal-title"><?php esc_html_e('Confirmation', 'ansar-import'); ?></h2>
+<div id="ImportConfirm" class="ansar-modal" style="display: none;">
+    <div class="ansar-modal-dialog">
+        <button class="ansar-modal-close-default" type="button" id="closeConfirm">&times;</button>
+        
+        <div class="ansar-modal-header">
+            <h2 class="ansar-modal-title"><?php esc_html_e('Confirmation', 'ansar-import'); ?></h2>
         </div>
-        <div class="uk-modal-body">
-            <div class="demo-import-confirm-message"><?php echo sprintf('Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: <ol><li class="warning">Importing the demo on the site if you have already added the content is highly discouraged.</li> <li>You need to import demo on fresh WordPress install to exactly replicate the theme demo.</li> <li>It will install the required plugins as well as activate them for installing the required theme demo within your site.</li> <li>Copyright images will get replaced with other placeholder images.</li> <li>None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.</li> <li>It will take some time to import the theme demo.</li></ol>', 'ansar-import'); ?></div>
+
+        <div class="ansar-modal-body">
+            <div class="demo-import-confirm-message"><?php echo sprintf('Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: <ol><li>Importing the demo on the site if you have already added the content is highly discouraged.</li> <li>You need to import demo on fresh WordPress install to exactly replicate the theme demo.</li> <li>It will install the required plugins as well as activate them for installing the required theme demo within your site.</li> <li>Copyright images will get replaced with other placeholder images.</li> <li>None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.</li> <li>It will take some time to import the theme demo.</li></ol>', 'ansar-import'); ?></div>
         </div>
-        <ul class="import-option-list flex items-center justify-between">
+
+        <ul class="import-option-list">
             <li class="active">
-                <input class="uk-checkbox" type="checkbox" id="import-customizer" name="import-customizer" checked="checked">
+                <input class="ansar-checkbox" type="checkbox" id="import-customizer" name="import-customizer" checked="checked">
                 <label for="import-customizer"><?php esc_html_e('Import Customize Settings', 'ansar-import'); ?></label>
             </li>
             <li class="active">
-                <input class="uk-checkbox" type="checkbox" id="import-widgets" name="import-widgets" checked="checked">
+                <input class="ansar-checkbox" type="checkbox" id="import-widgets" name="import-widgets" checked="checked">
                 <label for="import-widgets"><?php esc_html_e('Import Widgets', 'ansar-import'); ?></label>
             </li>
             <li>
-                <input class="uk-checkbox" type="checkbox" id="import-content" name="import-content" >
+                <input class="ansar-checkbox" type="checkbox" id="import-content" name="import-content" >
                 <label for="import-content"><?php esc_html_e('Import Content', 'ansar-import'); ?></label>
             </li>
         </ul>
-        <div class="uk-modal-footer uk-text-right">
+
+        <div class="ansar-modal-footer">
             <form method="post" class="import">
                 <input type="hidden" name="theme_id" id="theme_id" value="0">
                 <?php wp_nonce_field('check-sec'); ?>
-                <button type="button" class="uk-button uk-button-default uk-modal-close" data-dismiss="modal"><?php esc_html_e('Close', 'ansar-import'); ?></button>
-                <button type="button" id="import_data" class="uk-button uk-button-primary"><?php esc_html_e('Confirm', 'ansar-import'); ?></button>
+                <button type="button" class="ansar-button ansar-button-default" id="cancelModal"><?php esc_html_e('Close', 'ansar-import'); ?></button>
+                <button type="button" class="ansar-button ansar-button-primary" id="import_data" ><?php esc_html_e('Confirm', 'ansar-import'); ?></button>
             </form>
         </div>
+
     </div>
 </div>

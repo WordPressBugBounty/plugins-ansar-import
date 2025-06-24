@@ -79,6 +79,69 @@ class Ansar_Import {
         $this->define_admin_hooks();
         $this->define_public_hooks();
     }
+    
+    function is_theme_installed($theme_slug) {
+        $theme = wp_get_theme($theme_slug);
+        return $theme->exists();
+    }
+    
+    function is_theme_active($theme_slug) {
+        return get_stylesheet() === $theme_slug;
+    }
+    
+    function install_and_activate_theme($theme_slug) {
+        // Include necessary WordPress files
+        include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+        include_once ABSPATH . 'wp-admin/includes/theme.php';
+        // Check if the theme is already installed
+        $theme = wp_get_theme($theme_slug);
+        if ($theme->exists()) {
+            // If the theme is installed, activate it
+            switch_theme($theme_slug);
+            return;
+        }
+    
+        // Fetch theme details from WordPress.org
+        $api = themes_api('theme_information', ['slug' => $theme_slug]);
+        if (is_wp_error($api)) {
+            wp_send_json_error('Error: Unable to fetch theme details.');
+        }
+    
+        // Install the theme using the WordPress Theme Upgrader
+        $upgrader = new Theme_Upgrader();
+        $result = $upgrader->install($api->download_link);
+        if (is_wp_error($result)) {
+            wp_send_json_error('Error: Unable to install the theme.');
+        }
+    
+        // Check if the installed theme is a child theme
+        $theme = wp_get_theme($theme_slug);
+        if (isset($api->parent)) {
+            $parent_slug = $api->parent['slug'];
+            $parent_theme = wp_get_theme($parent_slug);
+    
+            // If the parent theme is not installed, install it
+            if (!$parent_theme->exists()) {
+                $parent_api = themes_api('theme_information', ['slug' => $parent_slug]);
+                if (is_wp_error($parent_api)) {
+                    wp_send_json_error("Error: Unable to fetch parent theme details for '{$parent_slug}'.");
+                }
+    
+                $parent_result = $upgrader->install($parent_api->download_link);
+                if (is_wp_error($parent_result)) {
+                    wp_send_json_error("Error: Unable to install the parent theme '{$parent_slug}'.");
+                }
+            }
+    
+            // Activate the parent theme first
+            switch_theme($parent_slug);
+        }
+    
+        // Finally, activate the child theme
+        switch_theme($theme_slug);
+    
+    }
+    
 
     /**
      * Load the required dependencies for this plugin.
@@ -140,8 +203,16 @@ class Ansar_Import {
         $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
     }
 
-    public function install_demo($theme_id, $customize = true, $widget = true, $content = true) {
+    public function install_demo($theme_id, $customize = true, $widget = true, $content = true, $theme = false) {
         
+    
+        
+        if($theme !== false){
+            if($this->is_theme_installed($theme) == false || $this->is_theme_active($theme) == false){
+                $this->install_and_activate_theme($theme);
+            }
+        }
+
         //sleep(15);
         //die();
         if (empty($theme_id)) {
@@ -178,10 +249,7 @@ class Ansar_Import {
         if (!is_dir($upload_dir)) { mkdir($upload_dir, 0755); }
 
         //Getting demo data
-        $theme_data_api = wp_remote_get(esc_url_raw("https://demos.themeansar.com/wp-json/wp/v2/demos/" . $theme_id),
-        array(
-            'timeout'     => 20,
-        ));
+        $theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/" . $theme_id), [ 'timeout' => 15 ]);
         $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
         $theme_data_api = json_decode($theme_data_api_body, TRUE);
         
@@ -276,6 +344,8 @@ class Ansar_Import {
         $this->loader->add_action('admin_menu', $plugin_admin, 'register_theme_page');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+        $this->loader->add_action('wp_ajax_infinity_load_demos', $plugin_admin, 'infinity_load_demos');
+        $this->loader->add_action('wp_ajax_nopriv_infinity_load_demos', $plugin_admin, 'infinity_load_demos');
     }
 
     /**

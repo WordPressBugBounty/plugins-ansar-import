@@ -313,39 +313,200 @@ html{
 }
 .demo-import-confirm-message{
     font-weight: 600;
+    font-size: 13px;
 }
-.uk-modal-dialog ul.import-option-list li.active{
+.ansar-modal-dialog ul.import-option-list li:has(:checked) {
     border: 3px solid #1e87f0;
 }  
-.uk-modal-dialog .import-option-list {
+.ansar-modal-dialog .import-option-list {
     margin-top: 0;
 }
-.uk-modal-dialog .uk-modal-body {
+.ansar-modal-dialog .ansar-modal-body {
     padding: 30px 30px 10px;
 }
-.uk-modal-dialog .uk-button {
+.ansar-modal-dialog .ansar-button {
     border-radius: 5px;
     margin-left: 7px;
 }
-.uk-modal-dialog .uk-modal-header{
+.ansar-modal-dialog .ansar-modal-header{
     background-color: #ddedfd;
 }
-.uk-modal-header .uk-modal-title{
+.ansar-modal-header .ansar-modal-title{
     font-weight: 600;
 }
-.uk-modal-dialog .uk-icon:not(.uk-preserve) [stroke*='#']:not(.uk-preserve){
+.ansar-modal-dialog .ansar-icon:not(.ansar-preserve) [stroke*='#']:not(.ansar-preserve){
     stroke: #000;
 }
-.uk-modal-dialog ul.import-option-list li input[type=checkbox]:checked::before{
+.ansar-modal-dialog ul.import-option-list li input[type=checkbox]:checked::before{
     display: none;
 }
-.uk-modal-dialog ul.import-option-list li .uk-checkbox:checked{
+.ansar-modal-dialog ul.import-option-list li .ansar-checkbox:checked{
     background-position: center;
     background-repeat: no-repeat;
     border: none;
     border-radius: 2px;
     box-shadow: none;
 }
-.uk-modal-dialog ul.import-option-list li .uk-checkbox:checked:focus{
+.ansar-checkbox:checked, .ansar-checkbox:indeterminate, .ansar-radio:checked {
+    background-color: #1e87f0;
+    color: #fff;
+    border-color: transparent;
+}
+.ansar-modal-dialog ul.import-option-list li .ansar-checkbox:checked:focus{
     box-shadow: none;
+}
+.ansar-checkbox:checked {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2214%22%20height%3D%2211%22%20viewBox%3D%220%200%2014%2011%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23fff%22%20points%3D%2212%201%205%207.5%202%205%201%205.5%205%2010%2013%201.5%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
+}
+
+.spinning {
+    display: inline-block;
+    animation: spin 2s linear infinite;
+}
+/* New Default Model  */
+
+/* Overlay */
+.ansar-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Dialog Box */
+.ansar-modal-dialog {
+    position: relative;
+    background: #fff;
+    border-radius: 4px;
+    width: 600px;
+    max-width: 95%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s ease-in-out;
+}
+
+/* Header */
+.ansar-modal-header {
+    background-color: #f0f4f8;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #ddd;
+}
+.ansar-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* Close Button */
+.ansar-modal-close-default {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+/* Body */
+.ansar-modal-body {
+    padding: 1.5rem;
+    font-size: 0.95rem;
+    color: #333;
+}
+.ansar-modal-body p {
+    margin-top: 0;
+}
+.ansar-modal-body ol {
+    padding-left: 1.2rem;
+}
+.ansar-modal-body li {
+    margin-bottom: 0.75rem;
+}
+.warning {
+    font-weight: bold;
+}
+
+/* Options */
+.import-option-list {
+     display: flex;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.5rem;
+    list-style: none;
+    margin: 0;
+}
+.import-option-list li {
+        display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f9fafb;
+    padding: 0.5rem 0.50rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.ansar-checkbox {
+    width: 16px;
+    height: 16px;
+}
+
+/* Footer */
+.ansar-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eee;
+    background: #f8fafc;
+    text-align: right;
+}
+.ansar-button {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+.ansar-button-default {
+    background-color: #e2e8f0;
+    color: #111827;
+}
+.ansar-button-primary {
+    background-color: #1e87f0;
+    color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* Column media query */
+@media(min-width: 1640px){
+    .grid-wrap{
+        grid-template-columns: repeat(4, 1fr);
+    } 
+}
+@media(max-width: 1120px){
+    .grid-wrap{
+        grid-template-columns: repeat(2, 1fr);
+    } 
 }

@@ -1,25 +1,48 @@
-=== Ansar Import ===
+=== Ansar Import – One Click Demo Import for WordPress Themes ===
 Contributors: Themeansar
-Tags: theme demos, demo, importer, one click import, readymate web temeplate
-Requires at least: 6.6
+Tags: theme demos, demo, importer, one click import
+Requires at least: 5.4
 Requires PHP: 7.4
 Tested up to: 6.8
-Stable tag: 1.0.19
-Version: 1.0.19
+Stable tag: 2.0.0
+Version: 2.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Import your demo content, widgets and theme settings with one click for Themeansar Theme
+Easily import theme demos in one click. Simplifies starter sites setup.
 
 == Description ==
 
-Import <a href="https://themeansar.com/" target="_blank" rel="nofollow">Themeansar</a> official themes demo content
+Ansar Import is a simple yet powerful one-click demo importer plugin for WordPress. Whether you're using a block-based Full Site Editing (FSE) theme, a classic theme, or a page builder like Elementor, Ansar Import makes it effortless to set up your theme just like the demo — in seconds.
 
-= Requirements =
+Perfect for theme users and agencies alike, Ansar Import helps you skip manual setups by importing demo content, widgets, menus, settings, templates, and theme customizations automatically.
 
-* WordPress 5.4 or later.
-* [Themeansar Themes](https://themeansar.com/)
+🚀 Key Features:
+✅ One Click Import – Quickly set up your site just like the theme demo.
 
+🧱 Supports FSE & Block Themes – Seamless with Full Site Editing and Gutenberg.
+
+🎨 Elementor Compatible – Easily import Elementor demo layouts and settings.
+
+🔄 Reusable Templates – Import custom templates, patterns, and starter designs.
+
+📦 Media & Content – Import pages, posts, images, menus, and widgets.
+
+🧑‍💻 Developer-Friendly Hooks – Extend or customize import logic easily.
+
+🧑‍💼 Who Is It For?
+Web Designers & Agencies – Quickly scaffold websites from starter kits.
+
+DIY Website Owners – Set up your website like the preview in minutes.
+
+📚 How It Works:
+Install and activate Ansar Import.
+
+Go to Appearance > Ansar Import.
+
+Select a demo and click "Import."
+
+Your site is ready with demo content and layout.
 
 == Installation ==
 
@@ -59,7 +82,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
-= 1.0.1 - 06-18-2020 =
+= 1.0.1 - 18-06-2020 =
 * Fixed issue
 
 = 1.0.2 - 07-05-2020 =
@@ -115,6 +138,8 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.0.18 - 06-11-2024 =
 * Fixed security issue.
 
-= 1.0.19 - 29-04-2025 =
+= 1.0.19 - 16-12-2024 =
 * Fixed Demo Preview Issue.
-* Fixed Demo Load Issue.
+
+= 2.0.0 - 19-6-2025 =
+* Add Starter Sites Page.
