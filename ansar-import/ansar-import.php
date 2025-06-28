@@ -3,10 +3,13 @@
  * Plugin Name:       Ansar Import
  * Plugin URI:        https://themeansar.com/
  * Description:       Ansar Import for Importing demo data Themeansar Theme.
- * Version:           2.0.0
+ * Version:           2.0.1
  * Author:            Themeansar
+ * Requires at least: 4.0
+ * Requires PHP:      5.2
  * Author URI:        https://themeansar.com/
  * Text Domain:       ansar-import
+ * Tested up to:      6.8.1
  * Domain Path:       /languages
  * License:           GNU General Public License v3.0
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.html

@@ -78,6 +78,30 @@ class Ansar_Import {
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+        $this->ta_theme_author_check();
+    }
+    
+    function ta_theme_author_check() {
+        $theme = wp_get_theme();
+        $author = $theme->get('Author');
+
+        if ( $author !== 'Themeansar' ) {
+            add_action("admin_notices", [$this, "ta_theme_notice"]);
+        }
+    }
+    
+    function ta_theme_notice() {
+        $starter_sites_url = esc_url(admin_url('admin.php?page=ansar-starter-sites')); // Replace with your actual URL
+
+        echo '<div class="notice notice-warning is-dismissible">';
+        echo '<p>' . __(
+            "Please activate one of Themeansar Themes to use Ansar Import For Starter Sites.",
+            "ansar-import"
+        ) . '</p>';
+
+        echo '<p><a href="' . $starter_sites_url . '" class="button-primary">' .
+            __('Browse Starter Sites', 'ansar-import') . '</a></p>';
+        echo '</div>';
     }
     
     function is_theme_installed($theme_slug) {

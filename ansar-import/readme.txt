@@ -3,9 +3,9 @@ Contributors: Themeansar
 Tags: theme demos, demo, importer, one click import
 Requires at least: 5.4
 Requires PHP: 7.4
-Tested up to: 6.8
-Stable tag: 2.0.0
-Version: 2.0.0
+Tested up to: 6.8.1
+Stable tag: 2.0.1
+Version: 2.0.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -143,3 +143,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 2.0.0 - 19-6-2025 =
 * Add Starter Sites Page.
+
+
+= 2.0.1 - 27-6-2025 =
+* Added Starter Sites text.
