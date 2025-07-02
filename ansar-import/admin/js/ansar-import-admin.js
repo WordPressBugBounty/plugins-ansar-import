@@ -163,9 +163,9 @@ jQuery(document).ready(function ($) {
         jQuery('#ImportConfirm').hide();
         jQuery('.btn-import-' + theme_id).addClass('updating-message');
         jQuery('.btn-import-' + theme_id).html("Importing...");
-        var customize = jQuery(this).closest(".uk-modal-dialog").find('.import-option-list #import-customizer').prop("checked");
-        var widget = jQuery(this).closest(".uk-modal-dialog").find('.import-option-list #import-widgets').prop("checked");
-        var content = jQuery(this).closest(".uk-modal-dialog").find('.import-option-list #import-content').prop("checked");
+        var customize = jQuery(this).closest(".ansar-modal-dialog").find('.import-option-list #import-customizer').prop("checked");
+        var widget = jQuery(this).closest(".ansar-modal-dialog").find('.import-option-list #import-widgets').prop("checked");
+        var content = jQuery(this).closest(".ansar-modal-dialog").find('.import-option-list #import-content').prop("checked");
         var data = {
             'action': 'import_action',
             'theme_id': theme_id,
@@ -190,7 +190,6 @@ jQuery(document).ready(function ($) {
                 // jQuery(".demo-ansar-container").hide();
                 jQuery('.btn-import-' + theme_id).addClass("uk-hidden");
                 jQuery('.live-btn-' + theme_id).removeClass("uk-hidden");
-                jQuery('#import_data').closest(".uk-modal-dialog").find('.import-option-list #import-content').removeAttr("checked");
 
             },
             error: function (data) {

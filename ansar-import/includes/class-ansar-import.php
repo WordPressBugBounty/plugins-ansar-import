@@ -229,8 +229,6 @@ class Ansar_Import {
 
     public function install_demo($theme_id, $customize = true, $widget = true, $content = true, $theme = false) {
         
-    
-        
         if($theme !== false){
             if($this->is_theme_installed($theme) == false || $this->is_theme_active($theme) == false){
                 $this->install_and_activate_theme($theme);

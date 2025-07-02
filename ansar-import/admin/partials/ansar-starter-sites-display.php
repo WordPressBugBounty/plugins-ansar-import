@@ -203,7 +203,7 @@ if (count($all_demos) == 0) {
                 <label for="import-widgets"><?php esc_html_e('Import Widgets', 'ansar-import'); ?></label>
             </li>
             <li>
-                <input class="ansar-checkbox" type="checkbox" id="import-content" name="import-content" >
+                <input class="ansar-checkbox" type="checkbox" id="import-content" name="import-content" checked="checked">
                 <label for="import-content"><?php esc_html_e('Import Content', 'ansar-import'); ?></label>
             </li>
         </ul>
