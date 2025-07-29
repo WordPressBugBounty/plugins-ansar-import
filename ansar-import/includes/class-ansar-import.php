@@ -94,13 +94,13 @@ class Ansar_Import {
         $starter_sites_url = esc_url(admin_url('admin.php?page=ansar-starter-sites')); // Replace with your actual URL
 
         echo '<div class="notice notice-warning is-dismissible">';
-        echo '<p>' . __(
+        echo '<p>' . esc_html__(
             "Please activate one of Themeansar Themes to use Ansar Import For Starter Sites.",
             "ansar-import"
         ) . '</p>';
 
-        echo '<p><a href="' . $starter_sites_url . '" class="button-primary">' .
-            __('Browse Starter Sites', 'ansar-import') . '</a></p>';
+        echo '<p><a href="' . esc_attr($starter_sites_url) . '" class="button-primary">' .
+            esc_html__('Browse Starter Sites', 'ansar-import') . '</a></p>';
         echo '</div>';
     }
     
@@ -114,30 +114,37 @@ class Ansar_Import {
     }
     
     function install_and_activate_theme($theme_slug) {
+    
         // Include necessary WordPress files
         include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
         include_once ABSPATH . 'wp-admin/includes/theme.php';
-        // Check if the theme is already installed
+        include_once ABSPATH . 'wp-admin/includes/file.php';
+        
+        // Check if theme already exists
         $theme = wp_get_theme($theme_slug);
         if ($theme->exists()) {
-            // If the theme is installed, activate it
             switch_theme($theme_slug);
-            return;
+            wp_send_json_success(['status' => 'ok', 'msg' => 'Theme already installed and activated']);
         }
-    
+        
         // Fetch theme details from WordPress.org
         $api = themes_api('theme_information', ['slug' => $theme_slug]);
         if (is_wp_error($api)) {
             wp_send_json_error('Error: Unable to fetch theme details.');
         }
-    
+        
         // Install the theme using the WordPress Theme Upgrader
-        $upgrader = new Theme_Upgrader();
+        
+        // Initialize the upgrader with a silent skin
+        $skin = new Automatic_Upgrader_Skin();
+        $skin->api = $api;
+
+        $upgrader = new Theme_Upgrader($skin);
         $result = $upgrader->install($api->download_link);
-        if (is_wp_error($result)) {
-            wp_send_json_error('Error: Unable to install the theme.');
+
+        if (!$result) {
+            wp_send_json_error('Error: Theme installation failed.');
         }
-    
         // Check if the installed theme is a child theme
         $theme = wp_get_theme($theme_slug);
         if (isset($api->parent)) {
@@ -164,6 +171,7 @@ class Ansar_Import {
         // Finally, activate the child theme
         switch_theme($theme_slug);
     
+        wp_send_json_success([ 'status' => 'ok', 'msg' => 'Required Theme Installed/Activated Successfully' ]);
     }
     
 
@@ -227,128 +235,134 @@ class Ansar_Import {
         $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
     }
 
-    public function install_demo($theme_id, $customize = true, $widget = true, $content = true, $theme = false) {
+    public function install_demo($theme_id, $customize = true, $widget = true, $content = true, $step = 'init', $theme = false) {
         
-        if($theme !== false){
-            if($this->is_theme_installed($theme) == false || $this->is_theme_active($theme) == false){
-                $this->install_and_activate_theme($theme);
-            }
-        }
-
-        //sleep(15);
-        //die();
-        if (empty($theme_id)) {
-            $importer_error = true;
-            $importer_error_msg = "No theme id passed!";
-        }
-
-        if($content !== 'false' ){
-            $nav_menus = wp_get_nav_menus();
-            // Delete navigation menus.
-            if (!empty($nav_menus)) {
-                foreach ($nav_menus as $nav_menu) {
-                    wp_delete_nav_menu($nav_menu->slug);
-                }
-            }
-        }
-
-        // Load Importer API
-        require_once ABSPATH . 'wp-admin/includes/import.php';
-        //check if wp_importer, the base importer class is available, otherwise include it
-        if (!class_exists('WP_Importer')) {
-            $class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
-            if (file_exists($class_wp_importer)) {
-                require_once( $class_wp_importer );
-            } else {
-                $importer_error = true;
-            }
-        }
-
         //Setting upload Dir
         $upload = wp_upload_dir();
         $upload_dir = $upload['basedir'];
         $upload_dir = $upload_dir . '/ansar_import_data';
         if (!is_dir($upload_dir)) { mkdir($upload_dir, 0755); }
+    
+        if($step == 'theme_init'){
+            if($theme !== false){
+                if($this->is_theme_installed($theme) == false || $this->is_theme_active($theme) == false){
+                    $this->install_and_activate_theme($theme);
+                }else{
+                    wp_send_json_success(['status' => 'ok', 'msg' => 'Theme is already active.']);
+                }
+            }
+        }
+        
+        if($step == 'demo_data_init'){
+            //sleep(15);
+            //die();
+            if (empty($theme_id)) {
+                $importer_error = true;
+                $importer_error_msg = "No theme id passed!";
+            }
 
-        //Getting demo data
-        $theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/" . $theme_id), [ 'timeout' => 15 ]);
-        $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
-        $theme_data_api = json_decode($theme_data_api_body, TRUE);
+            if($content !== 'false' ){
+                $nav_menus = wp_get_nav_menus();
+                // Delete navigation menus.
+                if (!empty($nav_menus)) {
+                    foreach ($nav_menus as $nav_menu) {
+                        wp_delete_nav_menu($nav_menu->slug);
+                    }
+                }
+            }
+
+            // Load Importer API
+            require_once ABSPATH . 'wp-admin/includes/import.php';
+            //check if wp_importer, the base importer class is available, otherwise include it
+            if (!class_exists('WP_Importer')) {
+                $class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
+                if (file_exists($class_wp_importer)) {
+                    require_once( $class_wp_importer );
+                } else {
+                    $importer_error = true;
+                }
+            }
+
+            //Getting demo data
+            $theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/" . $theme_id), [ 'timeout' => 15 ]);
+            $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
+            $theme_data_api = json_decode($theme_data_api_body, TRUE);
+            
+            
+            //Getting Demo files from url
+            if($content !== 'false' ){
+                file_put_contents($upload['basedir'] . '/ansar_import_data/data.xml', fopen($theme_data_api['data_file_url'], 'r'));
+            }
+            if($widget !== 'false' ){
+                file_put_contents($upload['basedir'] . '/ansar_import_data/widgets.wie', fopen($theme_data_api['widget_file_url'], 'r'));
+            }
+            if($customize !== 'false' ){
+                file_put_contents($upload['basedir'] . '/ansar_import_data/customizer.dat', fopen($theme_data_api['customizer_file_url'], 'r'));
+            }
+
+            //remove current home page if exsist
+            $home_d = get_posts(
+                array(
+                    'post_type'      => 'page',
+                    'post_title'     => 'Home',
+                    'post_status'    => 'any',
+                    'numberposts'    => 1,
+                )
+            );
+            
+            if (!empty($home_d)) {
+                $home_id = $home_d[0]->ID;
+                wp_delete_post($home_id, true);
+            }
+            wp_send_json_success(['status' => 'ok', 'msg' => 'Demo Data Files Imported Successfully']);
+        }
         
-        
-        //Getting Demo files from url
-        if($content !== 'false' ){
-            file_put_contents($upload['basedir'] . '/ansar_import_data/data.xml', fopen($theme_data_api['data_file_url'], 'r'));
+        if($step == 'demo_data_import'){
             $data_file = $upload['basedir'] . '/ansar_import_data/data.xml';
-        }
-        if($widget !== 'false' ){
-            file_put_contents($upload['basedir'] . '/ansar_import_data/widgets.wie', fopen($theme_data_api['widget_file_url'], 'r'));
             $wiget_file = $upload['basedir'] . '/ansar_import_data/widgets.wie';
-        }
-        if($customize !== 'false' ){
-            file_put_contents($upload['basedir'] . '/ansar_import_data/customizer.dat', fopen($theme_data_api['customizer_file_url'], 'r'));
             $customizer_file = $upload['basedir'] . '/ansar_import_data/customizer.dat';
-        }
 
-        //remove current home page if exsist
-        $home_d = get_posts(
-            array(
-                'post_type'      => 'page',
-                'post_title'     => 'Home',
-                'post_status'    => 'any',
-                'numberposts'    => 1,
-            )
-        );
-        
-        if (!empty($home_d)) {
-            $home_id = $home_d[0]->ID;
-            wp_delete_post($home_id, true);
-        }
-        
-        // File exists?
-        if (!file_exists($data_file) && $content !== 'false' ) {
-            wp_die(esc_html__('Data import file could not be found for data. Please try again.','ansar-import'));
-        } else if(file_exists($data_file) && $content !== 'false' ){
-    
-            // echo 'Pages import started! <br>';
-            $import = new ANS_WP_Import();
-            $import->dispatch();
+            // Suppress all output
+            ob_start();
 
-        }
-
-        // File exists?
-        if (!file_exists($wiget_file) && $widget !== 'false' ) {
-            wp_die(esc_html__('Import file could not be found for widget. Please try again.','ansar-import'));
-        } else if(file_exists($wiget_file) && $widget !== 'false' ){
-
-            //  echo 'importing widget . . . <br>';
-            $sidebars_widgets = wp_get_sidebars_widgets();
-    
-            // Reset active widgets.
-            foreach ($sidebars_widgets as $key => $widgets) {
-                $sidebars_widgets[$key] = array();
+            if ($content !== 'false') {
+                if (!file_exists($data_file)) {
+                    wp_send_json_error('Content Demo Data Import file could not be found.');
+                } else {
+                    $import = new ANS_WP_Import();
+                    $import->dispatch(); // Make sure this doesn't echo anything
+                }
             }
-    
-            wp_set_sidebars_widgets($sidebars_widgets);
-    
-            //reset Done
-            $ansar_importer = new Ansar_Import();
-            $wie_import_results = $ansar_importer->wie_import_data($wiget_file);
-            // echo 'Widget import done<br>';
 
-        }
-
-        // File exists?
-        if (!file_exists($customizer_file) && $customize !== 'false' ) {
-            wp_die(esc_html__('Customizer file could not be found for data. Please try again.','ansar-import'));
-        } else if(file_exists($customizer_file) && $customize !== 'false' ){
-            //echo 'Customizer import started!<br> ';
-            if($widget === 'false'){
-                $ansar_importer = new Ansar_Import();
+            if ($widget !== 'false') {
+                if (!file_exists($wiget_file)) {
+                    wp_send_json_error('Widget Demo Data Import file could not be found.');
+                } else {
+                    $sidebars_widgets = wp_get_sidebars_widgets();
+                    foreach ($sidebars_widgets as $key => $widgets) {
+                        $sidebars_widgets[$key] = array();
+                    }
+                    wp_set_sidebars_widgets($sidebars_widgets);
+                    $ansar_importer = new Ansar_Import();
+                    $wie_import_results = $ansar_importer->wie_import_data($wiget_file);
+                }
             }
-            $ansar_importer->ans_import_customizer_settings($customizer_file);
-            // update_option( 'ansar_demo_installed', $theme_id );
 
+            if ($customize !== 'false') {
+                if (!file_exists($customizer_file)) {
+                    wp_send_json_error('Customizer Demo Data file could not be found.');
+                } else {
+                    $ansar_importer = new Ansar_Import();
+                    $ansar_importer->ans_import_customizer_settings($customizer_file);
+                }
+            }
+
+            ob_end_clean(); // Discard any buffer output
+
+            wp_send_json_success([
+                'status' => 'ok',
+                'msg' => 'Theme Demo Data Imported Successfully'
+            ]);
         }
     }
 
@@ -718,6 +732,12 @@ class Ansar_Import {
         // echo 'Seting Home and Blog page . .<br>';
         // Get "Home" page by its path
         $home_page = get_page_by_path('home');
+
+        if ($home_page) {
+            update_option('page_on_front', $home_page->ID);
+            update_option('show_on_front', 'page');
+        }
+        $home_page = get_page_by_path('ta-home');
 
         if ($home_page) {
             update_option('page_on_front', $home_page->ID);

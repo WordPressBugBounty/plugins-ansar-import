@@ -1,6 +1,6 @@
 <div class="ansar-inner-box" data-color="<?php
         foreach ($demo['categories'] as $in_cat) {
-            echo "cat_" . esc_attr($in_cat) . " ";
+            echo "cat_" . esc_attr($in_cat['id']) . " ";
         }
     ?>">
     <!-- product -->
@@ -22,7 +22,22 @@
         </a>
         <div class="theme-author"><?php esc_html_e('By Themeansar','ansar-import'); ?> </div>
         <div class="theme-id-container">
-            <h2 class="theme-name" id=""><?php echo esc_attr($demo['title']['rendered']); ?></h2>
+            <div class="theme-names-about">
+                <h2 class="theme-name" id=""><?php echo esc_attr($demo['title']['rendered']); ?></h2>
+                <?php $lastcat = end($demo['categories']);
+                    $c = 0;
+                    foreach ($demo['categories'] as $in_cat) {
+                    if($c == 0){
+                        echo '<ul class="theme-cate">';
+                        $c++;
+                    }
+                    echo '<li class="theme-cate-item">'.$in_cat['name'].'</li>';
+                    
+                    if ($in_cat === $lastcat) {
+                        echo "</ul>";
+                    }
+                } ?>
+            </div>
             <div class="theme-actions">
 
                 <?php if ((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) { ?>

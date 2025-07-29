@@ -8,6 +8,9 @@
     padding: 0; 
     grid-template-columns: repeat(3, 1fr);
 }
+.toplevel_page_ansar-starter-sites .wrap, .ansar-import_page_ansar-demo-import .wrap{
+    margin: 20px 20px 0 2px;
+}
 .sp-product {
     background: #ffffff;
     border-bottom: 1px solid rgba(0,0,0,.1);
@@ -41,7 +44,7 @@
     min-width: 160px;
     width: auto;
     border-radius: 0;
-    z-index: 100;
+    z-index: 1;
     color: #fff;
     background-color: #33b750;
 
@@ -78,6 +81,9 @@
     border-radius: 4px;
     padding: 0px 6px;
     display: block;
+}
+.theme-browser .theme {
+    z-index: 0;
 }
 /*---------------------------------------
         2.4.Button Styles           
@@ -130,14 +136,12 @@
     max-width:none !important;
 
 }
-
 .modal-content {
     height: auto !important;
     min-height: 100% !important;
     border-radius: 0 !important;
     background-color: #ececec !important 
 }
-
 .modal-header {
     border-bottom: 1px solid #9ea2a2 !important;
 }
@@ -145,8 +149,6 @@
 .modal-footer {
     border-top: 1px solid #9ea2a2 !important;
 }
-
-
 .mx-auto {
     width: 20%;
 }
@@ -154,8 +156,6 @@
  h2 {
     font-size: 20px !important;
 }
-
-
 .p-mobile{
   margin: auto 0 auto -160px;
 width: 320px;
@@ -164,9 +164,6 @@ max-height: 100%;
 max-width: 100%;
 left: 50%;  
 }
-
-
-
 .p-tablet{
 margin: auto 0 auto -360px;
 width: 720px;
@@ -175,29 +172,93 @@ max-height: 100%;
 max-width: 100%;
 left: 50%;  
 }
-
+/*---------------------------------------
+    Admin Header Styles           
+-----------------------------------------*/
+.ansar-admin-header {
+    box-shadow: 0px 6px 8px -3px rgba(0,0,0,.03),0px 4px 6px -2px rgba(0,0,0,.03);
+    border-radius: 10px;
+    border: 0;
+    margin-bottom: 25px;
+    padding: 10px 15px;
+}
+.ansar-admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #cccbcbc2;
+    background: #fff;
+}
+.ansar-admin-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.ansar-admin-header-logo .ansar-logo img {
+    /* max-width: 100%; */
+    width: 200px;
+    height: auto;
+    vertical-align: middle;
+    object-fit: cover;
+}
+.ansar-admin-right-area {
+    display: flex;
+    align-items: baseline;
+    gap: 40px;
+}
+.ansar-admin-right-area > div {
+    position: relative;
+}
+.ansar-admin-right-area .ansar-version span {
+    color: #666;
+    display: inline-block;
+}
+.ansar-admin-right-area > div:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    height: 16px;
+    width: 1px;
+    background-color: #ccc;
+    right: -20px;
+}
+.ansar-admin-right-area .ansar-feature-pro a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    background: linear-gradient(180deg, rgb(197, 255, 210) -382%, #0c8526 100%);
+    color: #ffffff;
+    border: 0;
+    border-radius: 6px;
+    padding: 6px 13px;
+}
+.ansar-pro-icon {
+    line-height: 1;
+}
+.ansar-pro-icon svg {
+    width: 15px;
+    height: auto;
+}
 /*---new changes --*/
 html{
     background-color: unset !important;
 }
 
 .uk-subnav.uk-subnav-pill {
-    background-color: #fff;
     margin-left: unset;
     border: 1px solid #c3c4c7;
 }
 .uk-subnav.uk-subnav-pill li{
     margin-bottom: 0px;
-    margin-right: 15px;
+    box-shadow: 0px 4px 4px 0px rgba(14, 15, 17, 0.02), 0px 4px 26px 0px rgba(14, 15, 17, 0.03);
 }
 .uk-subnav-pill>.uk-active>a {
  
     border-bottom: 2px solid #333;
 }
 .uk-subnav.uk-subnav-pill li a{
-    padding: 15px 25px;
     text-transform: capitalize;
-    color: #646970;
+    background: #ffffff;
 }
 .uk-subnav.uk-subnav-pill li.uk-active a{
    background-color: unset;
@@ -234,13 +295,13 @@ html{
 
 .ansar-import-wrap
 {
-        margin: 80px 20px 0 2px;
-        text-align: center;
+    margin: 0;
+    text-align: center;
 }
 
 .ansar-import-wrap h1
 {
-    font-weight: 400;
+    font-weight: 700;
     font-size: 25px;
     padding: 35px 13px 0px;
     display: block !important; 
@@ -359,33 +420,39 @@ html{
     background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2214%22%20height%3D%2211%22%20viewBox%3D%220%200%2014%2011%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23fff%22%20points%3D%2212%201%205%207.5%202%205%201%205.5%205%2010%2013%201.5%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
 }
 
+#ans-ss-loading{
+    display: flex;
+    justify-content: center;
+}
 .spinning {
     display: inline-block;
     animation: spin 2s linear infinite;
 }
+
 /* New Default Model  */
 
 /* Overlay */
 .ansar-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 0;
     animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Dialog Box */
 .ansar-modal-dialog {
     position: relative;
-    background: #fff;
     border-radius: 4px;
     width: 600px;
     max-width: 95%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     animation: slideUp 0.3s ease-in-out;
+}
+.ansar-modal-dialog.ansar-import-options {
+    background: #fff;
 }
 
 /* Header */
@@ -409,6 +476,11 @@ html{
     border: none;
     font-size: 1.25rem;
     cursor: pointer;
+    z-index: 9;
+}
+.ansar-modal-close-default#importDoneClose {
+    top: -0.3rem;
+    right: -0.1rem;
 }
 
 /* Body */
@@ -509,4 +581,659 @@ html{
     .grid-wrap{
         grid-template-columns: repeat(2, 1fr);
     } 
+}
+
+/* import progress bar */
+.ansar-intall-importer .progress-tooltip {
+  position: relative;
+  padding-top: 50px;
+  margin-bottom: 30px;
+}
+.ansar-intall-importer .progress-tooltip .progress-tooltip-info {
+  align-items: center;
+  background: #000000;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  color: #ffffff;
+  display: inline-flex;
+  font-weight: 600;
+  justify-content: center;
+  height: 25px;
+  position: absolute;
+  top: 15px;
+  left: 0;
+  text-align: center;
+  transform: translateX(calc(-50% - 1px));
+  width: 50px;
+  font-size: 14px;
+  transition: left 1.5s ease-in-out;
+  border-radius: 5px;
+}
+.ansar-intall-importer .progress-tooltip .progress-tooltip-info::before, .ansar-intall-importer .progress-tooltip .progress-tooltip-info::after {
+  content: "";
+  display: inline-block;
+  border: 7px solid transparent;
+  border-top-color: #000000;
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.ansar-intall-importer .progress-tooltip .progress-tooltip-info::before {
+  border-width: 8px;
+  border-top-color: #ccc;
+  bottom: -16px;
+  left: 50%;
+}
+.ansar-intall-importer .progress-tooltip .progress-tooltip-info::after {
+  z-index: 1;
+}
+.ansar-intall-importer .progress {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  border-radius: 5px;
+  display: block;
+  font-family: sans-serif;
+  height: 10px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+.ansar-intall-importer .progress::-webkit-progress-bar {
+  background-color: #ccc;
+}
+.ansar-intall-importer .progress::-webkit-progress-value {
+  border-radius: 5px;
+  background-color: #22c55e;
+  background-size: 10px 10px;
+  -webkit-transition: width 1.5s ease-in-out;
+  transition: width 1.5s ease-in-out;
+}
+/* Import step progress */
+.ansar-intall-importer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ansar-intall-importer .inner {
+    max-width: 600px;
+    width: 100%;
+    background-color: rgba(255 255 255 / 30%);
+    box-shadow: 1px 3px 10px 0 rgba(0, 0, 0, 0.1490196078);
+    border-radius: 6px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255 255 255 / 25%);
+    padding: 30px;
+}
+.ansar-intall-importer .heading {
+  padding-top: 0px;
+}
+.ansar-intall-importer .heading .title {
+  font-size: 26px;
+  color: #ffffff;
+  position: relative;
+  display: inline-flex;
+  margin-bottom: 0;
+}
+.ansar-intall-importer .heading .title::after {
+  position: absolute;
+  content: "";
+  width: 60%;
+  height: 4px;
+  background-color: #33b750;
+  bottom: 0;
+  animation-name: slideRight;
+  animation-duration: 0.4s;
+  display: none;
+}
+.ansar-intall-importer .ansar-import-action {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  /* padding-bottom: 50px; */
+}
+.ansar-intall-importer .ansar-import-action .ansar-button {
+  text-decoration: none;
+  padding: 10px 20px;
+  display: inline-block;
+  text-transform: capitalize;
+  font-weight: 600;
+  background: #33b750;
+  color: #ffffff;
+  border-radius: 4px;
+  border: 2px solid #33b750;
+  transition: 0.3s;
+}
+.ansar-intall-importer .ansar-import-action .ansar-button.no-bg {
+  background-color: transparent;
+  color: #ffffff;
+  border-color: #33b750;
+}
+.ansar-intall-importer .ansar-import-action .ansar-button.no-bg:hover {
+  background-color: #33b750;
+  color: #ffffff;
+}
+.ansar-intall-importer.imported .heading {
+  margin-bottom: 30px;
+}
+.ansar-intall-importer.imported .import-popup-img {
+  width: 150px;
+  height: 150px;
+  transform: scaleX(-1);
+}
+
+@keyframes slideRight {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 60%;
+  }
+}
+.ansar-import-menu {
+  width: 100%;
+}
+
+a {
+  color: #212121;
+}
+
+.ansar-import-tabs {
+  counter-reset: step;
+  padding: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+}
+.ansar-import-tabs li {
+  list-style: none;
+  display: inline-block;
+  position: relative;
+  padding: 30px 25px 30px 50px;
+  width: 100%;
+  text-align: start;
+  /* one item */
+  /* two items */
+  /* three items */
+  /* four items */
+  /* five items */
+}
+.ansar-import-tabs li:first-child:nth-last-child(1) {
+  height: 100%;
+}
+.ansar-import-tabs li:first-child:nth-last-child(2), .ansar-import-tabs li:first-child:nth-last-child(2) ~ li {
+  height: 49%;
+}
+.ansar-import-tabs li:first-child:nth-last-child(3), .ansar-import-tabs li:first-child:nth-last-child(3) ~ li {
+  height: 30.3333%;
+}
+.ansar-import-tabs li:first-child:nth-last-child(4), .ansar-import-tabs li:first-child:nth-last-child(4) ~ li {
+  height: 24%;
+}
+.ansar-import-tabs li:first-child:nth-last-child(5), .ansar-import-tabs li:first-child:nth-last-child(5) ~ li {
+  height: 19%;
+}
+.ansar-import-tabs li a {
+    text-decoration: none;
+    font-size: 17px;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-weight: 500;
+    cursor: default;
+    color: #ffffff;
+    text-align: start;
+}
+.ansar-import-tabs li a:hover {
+  color: #212121;
+}
+.ansar-import-tabs li:before {
+    content: "";
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    border-radius: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #d5d5d5;
+    position: absolute;
+    left: 0px;
+    z-index: 2;
+    color: #000000;
+    font-size: 12px;
+}
+.ansar-import-tabs li span {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 0%;
+  background-color: #33b750;
+  top: -50%;
+  left: 11px;
+  z-index: 1;
+  transition: all 0.5s;
+}
+.ansar-import-tabs li:first-child:after {
+  content: none;
+}
+.ansar-import-tabs li .tab_active,
+.ansar-import-tabs li .tab_inactive,
+.ansar-import-tabs li .tab_active a,
+.ansar-import-tabs li .tab_inactive a {
+  color: #33b750;
+}
+.ansar-import-tabs li.tab_active:before {
+  border-color: #0E8161;
+  color: #ffffff;
+  content: "\f531";
+  font-weight: 400;
+  animation: ans-spin-360 2s infinite linear;
+  background: #0E8161;
+  transform: scaleX(-1);
+}
+
+@keyframes ans-spin-360 {
+  from{
+    rotate: 0deg;
+  }
+  to{
+    rotate: 360deg;
+  }
+}
+.ansar-import-tabs li.tab_inactive:before {
+  border-color: #33b750;
+  background-color: #33b750;
+  color: #fff;
+  content: "\f147";
+  font-size: 26px;
+  font-weight: bold;
+}
+.ansar-import-tabs li.tab_inactive a {
+  font-weight: 700;
+}
+.ansar-import-tabs li.tab_inactive + li span {
+  height: 100%;
+}
+
+/* new style  */
+.ansar-intall-importer .heading {
+  text-align: center;
+}
+.ansar-intall-importer .heading .title {
+  font-weight: 600;
+  text-align: center;
+  font-size: 24px;
+}
+.ansar-intall-importer .inner {
+  background-color: #ffffff;
+  max-width: 450px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 25px;
+}
+.ansar-intall-importer .ansar-import-tabs {
+  gap: 20px;
+}
+.ansar-intall-importer .ansar-import-tabs li {
+  padding: 0px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.ansar-intall-importer .ansar-import-tabs li::before {
+  content: '';
+  font-weight: 900;
+  position: unset;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  flex-shrink: 0;
+  font-size: 10px;
+  background-color: #f3f4f6;
+  color: #d1d5db;
+}
+.ansar-intall-importer .ansar-import-tabs li.tab_inactive a {
+  font-weight: 500;
+}
+.ansar-intall-importer .ansar-import-tabs li.tab_inactive::before {
+  background-color: #DCFCE7;
+  color: #22c55e;
+  content: "\f00c";
+  font-size: 16px;
+}
+.ansar-intall-importer .ansar-import-tabs li.tab_active:before {
+  color: #0ea5e9;
+  content: '';
+  font-weight: 900;
+  animation: ans-spin-360 2s infinite linear;
+  background-color: #e0f2fe;
+  font-size: 16px;
+}
+.ansar-intall-importer .ansar-import-tabs li.tab_active:after {
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%20style%3D%22%26%2310%3B%20%20%20%20width%3A%2016px%3B%26%2310%3B%20%20%20%20height%3A%2016px%3B%26%2310%3B%20%20%20%20fill%3A%20%230ea5e9%3B%26%2310%3B%22%3E%3Cpath%20d%3D%22M304%2048c0%2026.51-21.49%2048-48%2048s-48-21.49-48-48%2021.49-48%2048-48%2048%2021.49%2048%2048zm-48%20368c-26.51%200-48%2021.49-48%2048s21.49%2048%2048%2048%2048-21.49%2048-48-21.49-48-48-48zm208-208c-26.51%200-48%2021.49-48%2048s21.49%2048%2048%2048%2048-21.49%2048-48-21.49-48-48-48zM96%20256c0-26.51-21.49-48-48-48S0%20229.49%200%20256s21.49%2048%2048%2048%2048-21.49%2048-48zm12.922%2099.078c-26.51%200-48%2021.49-48%2048s21.49%2048%2048%2048%2048-21.49%2048-48c0-26.509-21.491-48-48-48zm294.156%200c-26.51%200-48%2021.49-48%2048s21.49%2048%2048%2048%2048-21.49%2048-48c0-26.509-21.49-48-48-48zM108.922%2060.922c-26.51%200-48%2021.49-48%2048s21.49%2048%2048%2048%2048-21.49%2048-48-21.491-48-48-48z%22%2F%3E%3C%2Fsvg%3E");
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    z-index: 2;
+    line-height: 10px;
+    left: 9.5px;
+    margin-bottom: 2px;
+    animation: ans-spin-360 2s infinite linear;
+}
+.ansar-intall-importer .ansar-import-tabs li:after {    
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%20style%3D%22%26%2310%3B%20%20%20%20fill%3A%20%23d1d5db%3B%26%2310%3B%22%3E%3Cpath%20d%3D%22M256%208C119%208%208%20119%208%20256s111%20248%20248%20248%20248-111%20248-248S393%208%20256%208z%22%2F%3E%3C%2Fsvg%3E");
+    width: 13px;
+    height: 13px;
+    position: absolute;
+    z-index: 2;
+    line-height: 10px;
+    left: 11.5px;
+    margin-bottom: 5px;
+}
+.ansar-intall-importer .ansar-import-tabs li.tab_inactive:after {
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%20style%3D%22%26%2310%3B%20%20%20%20fill%3A%20%2322c55e%3B%26%2310%3B%22%3E%3Cpath%20d%3D%22M173.898%20439.404l-166.4-166.4c-9.997-9.997-9.997-26.206%200-36.204l36.203-36.204c9.997-9.998%2026.207-9.998%2036.204%200L192%20312.69%20432.095%2072.596c9.997-9.997%2026.207-9.997%2036.204%200l36.203%2036.204c9.997%209.997%209.997%2026.206%200%2036.204l-294.4%20294.401c-9.998%209.997-26.207%209.997-36.204-.001z%22%2F%3E%3C%2Fsvg%3E");
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    z-index: 2;
+    line-height: 10px;
+    left: 9.5px;
+    margin-bottom: 2px;
+}
+.ansar-intall-importer.imported .inner {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+.ansar-intall-importer.imported .inner .succes-icon {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 20px;
+    background-color: #DCFCE7;
+    color: #22c55e;
+    margin: 0 auto 25px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ansar-intall-importer.imported .inner .succes-icon::before {
+    content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%20style%3D%22%26%2310%3B%20%20%20%20fill%3A%20%2322c55e%3B%26%2310%3B%22%3E%3Cpath%20d%3D%22M173.898%20439.404l-166.4-166.4c-9.997-9.997-9.997-26.206%200-36.204l36.203-36.204c9.997-9.998%2026.207-9.998%2036.204%200L192%20312.69%20432.095%2072.596c9.997-9.997%2026.207-9.997%2036.204%200l36.203%2036.204c9.997%209.997%209.997%2026.206%200%2036.204l-294.4%20294.401c-9.998%209.997-26.207%209.997-36.204-.001z%22%2F%3E%3C%2Fsvg%3E");
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    
+}
+.ansar-modal-dialog.ansar-import-complete {
+    width: 450px;
+}
+.ansar-intall-importer.imported .inner .heading {
+  text-align: center;
+}
+.ansar-intall-importer.imported .inner .heading .title {
+  margin-bottom: 0;
+  gap: 5px;
+  align-items: baseline;
+}
+.ansar-intall-importer.imported .inner .heading p {
+  margin-top: 12px;
+}
+.ansar-intall-importer.imported .inner .ansar-import-action {
+  padding-bottom: 0;
+}
+
+/*ansar-import*/
+.ansar-manual-import-notice {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5% 10%;
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+}
+.ansar-manual-import-notice.show-notice {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+.ansar-manual-import-notice.show-notice .ansar-manual-import-content {
+  transform: translateY(0%);
+}
+.ansar-manual-import-notice .ansar-manual-import-content {
+  height: auto;
+  width: 50%;
+  padding: 40px;
+  background: white;
+  border-radius: 5px;
+  overflow: auto;
+  position: relative;
+  margin: 2rem auto;
+  transform: translateY(-10%);
+  transition: all 0.3s ease-out;
+}
+.ansar-manual-import-notice h3, .ansar-manual-import-notice p {
+  color: #363636;
+}
+.ansar-manual-import-notice .ansar-manual-import-icon {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+.ansar-manual-import-notice .ansar-manual-import-icon img {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+
+/* EXTRA CSS */
+.ansar-modal {
+    background: rgb(0 0 0 / 30%);
+    backdrop-filter: blur(5px);
+}
+.ansar-intall-importer .inner {
+    background-color: rgba(255 255 255 / 100%);
+}
+.ansar-import-tabs li.tab_inactive:before {
+  font-size: 20px;
+  font-weight: normal;
+}
+.ansar-import-tabs li.tab_inactive a {
+    font-weight: 500;
+}
+.ansar-import-tabs li a {
+    color: #000000;
+}
+.ansar-intall-importer .heading .title {
+    font-weight: 600;
+    color: #000000;
+}
+/* confirmation */
+.ansar-modal-dialog .ansar-modal-header {
+    background-color: #f6f7f7;
+    border-radius: 10px 10px 0 0;
+}
+.ansar-modal-footer {
+    background: #f6f7f7;
+    border-radius: 0 0 10px 10px;
+}
+.ansar-modal-dialog ul.import-option-list li:has(:checked) {
+    border: 3px solid #26963e;
+}
+.ansar-modal-dialog .ansar-button.ansar-button-primary {
+    background: linear-gradient(180deg, rgb(197, 255, 210) -382%, #0c8526 100%);
+    border: 1px solid #0c8526;
+}
+.import-option-list li input[type=checkbox]{
+    margin: 0;
+}
+/*  */
+.ansar-modal-dialog .ansar-button.ansar-button-default {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: #f6f7f7;
+}
+.ansar-checkbox:checked, .ansar-checkbox:indeterminate, .ansar-radio:checked {
+    background-color: #26963e;
+}
+.uk-subnav.uk-subnav-pill {
+    gap: 10px;
+    border-radius: 10px;
+    border: 0;
+    margin-bottom: 25px;
+    padding: 5px 0;
+}
+.uk-card.theme {
+    padding: 12px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 0;
+    box-shadow: 0px 4px 4px 0px rgba(14, 15, 17, 0.02), 0px 4px 26px 0px rgba(14, 15, 17, 0.03);
+}
+.theme-browser .theme.focus {
+    box-shadow: 0px 4px 4px 0px rgba(14, 15, 17, 0.02), 0px 4px 26px 0px rgba(14, 15, 17, 0.03);
+}
+.theme-browser .theme .theme-screenshot {
+    border-radius: 10px;
+}
+.theme-browser .theme .theme-name {    
+    box-shadow: none;
+    padding: 0;
+    overflow: hidden;
+    height: auto;
+    margin-bottom: 6px;
+}
+.ribbon {
+    box-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 5px 15px;
+    position: absolute;
+    right: 12px;
+    min-width: auto;
+    text-align: center;
+    top: 12px;
+    transform: rotate(0deg);
+    width: auto;
+    border-radius: 0;
+    z-index: 1;
+    color: #fff;
+    background-color: #33b750;
+    border-radius: 20px;
+}
+.uk-subnav.uk-subnav-pill li a {
+    font-weight: 500;
+}
+.theme-browser .theme .theme-actions, .theme-browser .theme.active .theme-actions {
+    position: unset;
+    transform: unset;
+    inset: 0;
+    padding: 0;
+    box-shadow: unset;
+    border-left: 0;
+    background: transparent;
+    flex-shrink: 0;
+    opacity: 1;
+}
+.theme-browser .theme .theme-name {
+    padding: 0;
+    overflow: hidden;
+}
+.ansar-inner-box .theme-id-container {
+    display: flex;
+    padding: 15px 0px 0 0px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+}
+.theme-browser .theme .theme-actions button.button,.theme-browser .theme .theme-actions a.button.activate {
+    margin-left: 0px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 500;
+}
+.theme-browser .theme .theme-actions a.button:not(.activate) {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 5px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, rgb(197, 255, 210) -382%, #0c8526 100%);
+    border-color: #0c8526;
+}
+.ansar-inner-box .theme .theme-screenshot::before{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: #000;
+    z-index: 1;
+    opacity: 0.05;
+    transition: 0.4s;
+}
+.ansar-inner-box .theme:hover .theme-screenshot::before{
+    opacity: 0.8;
+}
+.ansar-inner-box .theme .more-details {
+    background: rgb(147 147 147 / 70%);
+     transition: 0.6s;
+}
+.ansar-inner-box .theme .more-details {
+    z-index: 1;
+}
+/* categories */
+.theme-names-about .theme-cate {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.theme-names-about .theme-cate .theme-cate-item{
+    color: #a5a5a5;
+    position: relative;
+}
+.theme-names-about .theme-cate .theme-cate-item:not(:last-child)::after{
+    content: ',';
+}
+.ansar-inner-box .theme-names-about {
+    width: 55%;
+    overflow: hidden;
+}
+/* tabs */
+.uk-subnav.uk-subnav-pill li a:focus {
+    outline: none;
+    box-shadow: none;
+}
+.uk-subnav.uk-subnav-pill li.uk-active a {
+    background: linear-gradient(180deg, rgb(197, 255, 210) -382%, #0c8526 100%);
+    color: #ffffff;
+    border: 0;    
+}
+.uk-subnav.uk-subnav-pill li a {
+    padding: 8px 20px;
+    border-radius: 5px;
+}
+.ansar-intall-importer .ansar-import-action .ansar-button.no-bg {
+    color: #000000;
+}
+/* image */
+.theme-browser.rendered .theme.focus .theme-screenshot img, .theme-browser.rendered .theme:hover .theme-screenshot img {
+    opacity: 1;
 }

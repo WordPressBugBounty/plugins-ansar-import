@@ -54,14 +54,23 @@ class Ansar_Import_Admin {
     }
 
     public function import_data_ajax() {
-        $ansar_importer = new Ansar_Import();
-        if(isset($_POST['theme_name'])){
-            $theme_name = $_POST['theme_name'];
-        }else{
-            $theme_name = false;
+        // Verify nonce
+        if ( !isset($_POST['check_import_nonce']) || !wp_verify_nonce(wp_unslash($_POST['check_import_nonce']), 'ansar_demo_import_nonce') ) {
+            wp_send_json_error(['status' => 'error', 'msg' => 'Security check failed.']);
+            return;
         }
 
-        $ansar_importer->install_demo(sanitize_key($_POST['theme_id']), sanitize_key($_POST['customize']), sanitize_key($_POST['widget']), sanitize_key($_POST['content']), $theme_name);
+        // Sanitize inputs
+        $theme_id   = isset($_POST['theme_id']) ? sanitize_key(($_POST['theme_id'])) : '';
+        $customize  = isset($_POST['customize']) ? sanitize_key($_POST['customize']) : '';
+        $widget     = isset($_POST['widget']) ? sanitize_key($_POST['widget']) : '';
+        $content    = isset($_POST['content']) ? sanitize_key($_POST['content']) : '';
+        $step       = isset($_POST['step']) ? sanitize_key($_POST['step']) : '';
+        $theme_name = isset($_POST['theme_name']) ? sanitize_text_field(wp_unslash($_POST['theme_name'])) : false;
+
+        // Call importer
+        $ansar_importer = new Ansar_Import();
+        $ansar_importer->install_demo($theme_id, $customize, $widget, $content, $step, $theme_name);
     }
 
     public function register_theme_page() {
@@ -72,7 +81,7 @@ class Ansar_Import_Admin {
         
         add_submenu_page('ansar-starter-sites', 'Starter Sites', 'Starter Sites', 'manage_options', 'ansar-starter-sites');
         
-        if(wp_get_theme()->get('Author') == 'Themeansar'){
+        if(wp_get_theme()->get('Author') == 'themeansar' || wp_get_theme()->get('Author') == 'Themeansar'){
             add_submenu_page('ansar-starter-sites', 'Theme Demos', 'Theme Demos', 'manage_options', 'ansar-demo-import', array($this, 'theme_option_page'));
         }
     }
@@ -107,6 +116,8 @@ class Ansar_Import_Admin {
             $paged = $_POST['paged'];
             $seed = $_POST['seed'];
         }
+        $theme_data = wp_get_theme();
+        $theme_name = $theme_data->get('Name');
 
         $theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/?orderby=rand&seed=$seed&per_page=12&page=$paged"), [ 'timeout' => 15 ]);
         $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
@@ -119,7 +130,7 @@ class Ansar_Import_Admin {
         } else {
             foreach ($quaried_demos as $demo) {
                 // Pass $demo as data to the template
-                $response .= $this->plugin_get_template_content(['demo' => $demo]);
+                $response .= $this->plugin_get_template_content(['demo' => $demo, 'theme_name' => $theme_name]);
             }
             $paged++;
         } 
@@ -157,6 +168,7 @@ class Ansar_Import_Admin {
      * @since    1.0.0
      */
     public function enqueue_styles() {
+		$screen = get_current_screen();
 
         /**
          * This function is provided for demonstration purposes only.
@@ -169,7 +181,7 @@ class Ansar_Import_Admin {
          * between the defined hooks and the functions defined in this
          * class.
          */
-        if (isset($_GET['page']) == 'ansar-demo-import') {
+        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import' ) {
             wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/ansar-import-admin.css', array(), $this->version, 'all');
             wp_enqueue_style('uikit', plugin_dir_url(__FILE__) . 'css/uikit.min.css', array(), $this->version, 'all');
             wp_enqueue_style('theme');
@@ -196,7 +208,7 @@ class Ansar_Import_Admin {
          * class.
          */
         //$themes = wp_prepare_themes_for_js( array( wp_get_theme() ) );
-        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import'   ) {
+        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import' ) {
             remove_all_actions( 'admin_notices' );
             wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/ansar-import-admin.js', array('jquery'), $this->version, false);
             wp_enqueue_script('uikit-js', plugin_dir_url(__FILE__) . 'js/uikit.min.js', array('jquery'), $this->version, false);
@@ -209,7 +221,7 @@ class Ansar_Import_Admin {
                 'my_ajax_object',
                     array( 
                         'ajax_url' => admin_url('admin-ajax.php'),
-                        'nonce' => wp_create_nonce('check-sec'),
+                        'nonce' => wp_create_nonce('ansar_demo_import_nonce'),
                         'theme_name' => $theme_name
                     )
             );

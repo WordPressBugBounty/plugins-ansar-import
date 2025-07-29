@@ -103,7 +103,9 @@ jQuery(document).ready(function ($) {
     jQuery(".btn-import").click(function () {
         jQuery("#theme_id").val(jQuery(this).data('id'));
         jQuery("#theme_id").attr('tname',jQuery(this).attr('tname'));
-        UIkit.modal('#AnsardemoPreview').hide();
+        if (jQuery('#AnsardemoPreview').length) {
+            UIkit.modal('#AnsardemoPreview').hide();
+        }
         // UIkit.modal('#Confirm').show();
         if(jQuery('.theme').hasClass("focus")){
             jQuery('.theme').removeClass("focus");
@@ -122,30 +124,32 @@ jQuery(document).ready(function ($) {
         const modal = document.getElementById('ImportConfirm');
         const openBtn = document.querySelectorAll('.btn-import');
         const closeBtn = document.getElementById('closeConfirm');
+        const closeBtn2 = document.getElementById('importDoneClose');
         const cancelBtn = document.getElementById('cancelModal');
         
         document.querySelectorAll('.btn-import').forEach(function(el) {
             el.addEventListener('click', function() {
-                console.log('yes clicked');
                 modal.style.display = 'flex';
+                document.getElementById('ansar-import-options').removeAttribute('style');
             });
         });
         // openBtn.addEventListener('click', () => {
         //     modal.style.display = 'flex';
         // });
     
-        [closeBtn, cancelBtn].forEach(btn => {
+        [closeBtn, closeBtn2, cancelBtn].forEach(btn => {
             btn.addEventListener('click', () => {
                 modal.style.display = 'none';
+                document.getElementById('ansar-import-complete').style.display = 'none';
             });
         });
     
-        // Close when clicking outside modal content
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
+        // // Close when clicking outside modal content
+        // modal.addEventListener('click', (e) => {
+        //     if (e.target === modal) {
+        //         modal.style.display = 'none';
+        //     }
+        // });
     
         // Close with Escape key
         document.addEventListener('keydown', (e) => {
@@ -160,14 +164,21 @@ jQuery(document).ready(function ($) {
     jQuery("#import_data").on("click", function ($) {
         var curr_btn = jQuery(this);
         var theme_id = jQuery("#theme_id").val();
-        jQuery('#ImportConfirm').hide();
-        jQuery('.btn-import-' + theme_id).addClass('updating-message');
-        jQuery('.btn-import-' + theme_id).html("Importing...");
+        // jQuery('#ImportConfirm').hide();
+        // jQuery('.btn-import-' + theme_id).addClass('updating-message');
+        // jQuery('.btn-import-' + theme_id).html("Importing...");
         var customize = jQuery(this).closest(".ansar-modal-dialog").find('.import-option-list #import-customizer').prop("checked");
         var widget = jQuery(this).closest(".ansar-modal-dialog").find('.import-option-list #import-widgets').prop("checked");
         var content = jQuery(this).closest(".ansar-modal-dialog").find('.import-option-list #import-content').prop("checked");
-        var data = {
+        var demo_data = {
             'action': 'import_action',
+            'theme_id': theme_id,
+            'customize': customize,
+            'widget': widget,
+            'content': content,
+            'nonce': my_ajax_object.nonce
+        };
+        var data = {
             'theme_id': theme_id,
             'customize': customize,
             'widget': widget,
@@ -176,41 +187,282 @@ jQuery(document).ready(function ($) {
         };
 
         if(jQuery("#theme_id").attr('tname')){
-            data.theme_name = jQuery("#theme_id").attr('tname');
-            console.log(data.theme_name)
+            demo_data.theme_name = jQuery("#theme_id").attr('tname');
+            demo_data.progress = 'by_theme';
+            install_required_theme(demo_data);
+        }else{
+            demo_data.progress = 'by_file';
+            init_demo_data(demo_data);
         }
 
+    });
 
+    function install_required_theme(demo_data){
+        data = {
+            'action': demo_data.action,
+            'theme_id': demo_data.theme_id,
+            'customize': demo_data.customize,
+            'widget': demo_data.widget,
+            'content': demo_data.content,
+            'theme_name': demo_data.theme_name,
+            'check_import_nonce': my_ajax_object.nonce,
+            'step': 'theme_init'
+        }
         jQuery.ajax({
-            type: "POST",
-            url: my_ajax_object.ajax_url,
+            type: "POST", 
+            url: my_ajax_object.ajax_url, 
             data: data,
-            success: function (data) {
-                console.log(data);
-                // jQuery(".demo-ansar-container").hide();
-                jQuery('.btn-import-' + theme_id).addClass("uk-hidden");
-                jQuery('.live-btn-' + theme_id).removeClass("uk-hidden");
+            beforeSend: function(){
+                // jQuery("#import-step-data").html("Importing theme data files...");
 
+                // jQuery("#progress-wrapper").removeClass('hide');
+                    
+                setTimeout(function(){ 
+                    var target = 5; 
+                    var current = 0;
+                    var duration = 1500;
+
+                    jQuery(".progress-tooltip-info").css('left', target + '%');
+                    
+                    let stepTime = duration / target;
+
+                    let interval = setInterval(function () {
+                        
+                        jQuery(".progress-tooltip-info").text(current + '%');
+
+                        if (current >= target) {
+                            clearInterval(interval);
+                        }
+
+                        current++;
+                    }, stepTime);
+
+                    jQuery(".progress").attr('value', target);
+                    jQuery(".progress").text(target + '%');
+                }, 500);
+                
+                jQuery('.ansar-import-options').hide();
+                jQuery('.ansar-importing').show();
+                // // jQuery(".progress-value").animate({ width:'5%'});
+                // // jQuery("#progress-percentage").html('5%');
+                jQuery("#theme_step").addClass('tab_active');
             },
-            error: function (data) {
-                // alert(data);
-                alert('Oops! Something went wrong. The demo data could not be imported. Please try again or check your internet connection.');
-                console.log(data);
+            success: function (response) {
+                console.log(response);
+                if(response.data.status == 'ok') {
+                    
+                    setTimeout(function(){ 
+                        var target = 35;
+                        var current = 5;
+                        var duration = 1500;
+                        
+                        jQuery(".progress-tooltip-info").css('left', target + '%');
+                        
+
+                        let stepTime = duration / target;
+
+                        let interval = setInterval(function () {
+                            
+                                jQuery(".progress-tooltip-info").text(current + '%');
+
+                            if (current >= target) {
+                                clearInterval(interval);
+                            }
+
+                            current++;
+                        }, stepTime);
+
+                        jQuery(".progress").attr('value', target);
+                        jQuery(".progress").text(target + '%');
+                        
+                        $("#theme_step a").text('Required Theme Installed/Activated Successfully');
+                        init_demo_data(demo_data);
+                    }, 1500);
+                } 
+                // else {
+                //     jQuery("#progress-error-wrapper").removeClass("hide");
+                //     jQuery("#import-error-text").html(response.msg);
+                // }
+            }, 
+            error: function (response) {
+                console.log(response);
+                alert("Something went wrong!, Contact Plugin Author For Further Help");
+                console.log("Something went wrong! from : install_required_theme");
             }
 
         });
-        return false;
+    }
 
-    });
+    function init_demo_data(demo_data){
+        data = {
+            'action': demo_data.action,
+            'theme_id': demo_data.theme_id,
+            'customize': demo_data.customize,
+            'widget': demo_data.widget,
+            'content': demo_data.content,
+            'check_import_nonce': my_ajax_object.nonce,
+            'step': 'demo_data_init'
+        }
+        jQuery.ajax({
+            type: "POST", 
+            url: my_ajax_object.ajax_url, 
+            data: data,
+            beforeSend: function(){      
+                jQuery('.ansar-import-options').hide();
+                jQuery('.ansar-importing').show();
+                jQuery("#theme_step").removeClass('tab_active').addClass('tab_inactive');
+                jQuery("#demo_file_step").addClass('tab_active');   
+                if(demo_data.progress == 'by_file'){
+                    setTimeout(function(){ 
+                        var target = 15; 
+                        var current = 0;
+                        var duration = 1500;
+
+                        jQuery(".progress-tooltip-info").css('left', target + '%');
+                        
+                        let stepTime = duration / target;
+
+                        let interval = setInterval(function () {
+                            
+                            jQuery(".progress-tooltip-info").text(current + '%');
+
+                            if (current >= target) {
+                                clearInterval(interval);
+                            }
+
+                            current++;
+                        }, stepTime);
+
+                        jQuery(".progress").attr('value', target);
+                        jQuery(".progress").text(target + '%');
+                    }, 500);
+                }
+            },
+            success: function (response) {
+                console.log(response);
+                if(response.data.status == 'ok') {
+                    if(demo_data.progress == 'by_file'){
+                        var target = 60;
+                        var current = 15;
+                    }else{
+                        var target = 65;
+                        var current = 35;
+                    }
+                    var duration = 1500;
+                            
+                    jQuery(".progress-tooltip-info").css('left', target + '%');
+
+                    let stepTime = duration / target;
+
+                    let interval = setInterval(function () {
+                        
+                            jQuery(".progress-tooltip-info").text(current + '%');
+
+                        if (current >= target) {
+                            clearInterval(interval);
+                        }
+
+                        current++;
+                    }, stepTime);
+
+                    jQuery(".progress").attr('value', target);
+                    jQuery(".progress").text(target + '%');
+                    
+                    setTimeout(function(){ 
+                        import_demo_data(demo_data);
+                    }, 100);
+                    $("#demo_file_step a").text('Import Data Initialized');
+                } 
+                // else {
+                //     jQuery("#progress-error-wrapper").removeClass("hide");
+                //     jQuery("#import-error-text").html(response.msg);
+                // }
+            }, 
+            error: function (response) {
+                console.log(response);
+                alert("Something went wrong!, Contact Plugin Author For Further Help");
+                console.log("Something went wrong! from : init_demo_data");
+            }
+
+        });
+    }
+
+    function import_demo_data(demo_data){
+        data = {
+            'action': demo_data.action,
+            'theme_id': demo_data.theme_id,
+            'customize': demo_data.customize,
+            'widget': demo_data.widget,
+            'content': demo_data.content,
+            'check_import_nonce': my_ajax_object.nonce,
+            'step': 'demo_data_import'
+        }
+        jQuery.ajax({
+            type: "POST", 
+            url: my_ajax_object.ajax_url, 
+            data: data,
+            beforeSend: function(){            
+                jQuery("#demo_file_step").removeClass('tab_active').addClass('tab_inactive');
+                jQuery("#demo_import_step").addClass('tab_active');           
+            },
+            success: function (response) {
+                setTimeout(function(){ 
+                    if(demo_data.progress == 'by_file'){
+                        var target = 100;
+                        var current = 60;
+                    }else{
+                        var target = 100;
+                        var current = 65;
+                    }
+                    var duration = 1500;
+
+                    jQuery(".progress-tooltip-info").css('left',  target + '%');
+
+                    let stepTime = duration / target;
+
+                    let interval = setInterval(function () {
+                        
+                            jQuery(".progress-tooltip-info").text(current + '%');
+
+                        if (current >= target) {
+                            clearInterval(interval);
+                        }
+
+                        current++;
+                    }, stepTime);
+
+                    jQuery(".progress").attr('value', target);
+                    jQuery(".progress").text( target + '%');
+                }, 100);
+                jQuery("#demo_import_step").removeClass('tab_active').addClass('tab_inactive');
+                setTimeout(function(){ 
+                    jQuery(".progress-tooltip-info").css('left', '0%');
+                    jQuery(".progress-tooltip-info").text('0%');
+                    jQuery(".progress").attr('value', '0');
+                    jQuery(".progress").text('0%');
+                    jQuery("#theme_step").removeClass('tab_inactive');
+                    jQuery("#demo_file_step").removeClass('tab_inactive');
+                    jQuery("#demo_import_step").removeClass('tab_inactive');
+                    jQuery('.ansar-importing').hide();
+                    jQuery('.ansar-import-complete').show();
+                }, 2500);
+            }, 
+            error: function (response) {
+                console.log(response);
+                alert("Something went wrong!, Contact Plugin Author For Further Help");
+                console.log("Something went wrong! from : import_demo_data");
+            }
+
+        });
+    }
     
     var loop = true;  
-    let currentPage = 1;
+    var currentPage = 1;
     jQuery(window).scroll(function() {
-        var targetElement = jQuery('#ans-infinity-load');  
+        var targetElement = jQuery('#ansar-infinity-load');  
         if(targetElement.length === 1){
             var distanceToElement = targetElement.offset().top - jQuery(window).scrollTop();
             if (distanceToElement <= 2200 && loop == true) {
-                console.log('yes scrolled');
                 loop = false;
                 currentPage++;
                 loadMorePosts(currentPage);
@@ -220,12 +472,12 @@ jQuery(document).ready(function ($) {
 
     // Function to infinity load more posts via AJAX
     function loadMorePosts(page) {
-        let seed = jQuery('#ans-infinity-load').attr('seed');
-        // console.log(type);
+        let seed = jQuery('#ansar-infinity-load').attr('seed');
         var data = {
             action: 'infinity_load_demos',
             paged: page,
             seed: seed,
+            'check_import_nonce': my_ajax_object.nonce,
         };
 
         var i = 1;
@@ -241,9 +493,9 @@ jQuery(document).ready(function ($) {
                     jQuery(".btn-import").click(function () {
                         jQuery("#theme_id").val(jQuery(this).data('id'));
                         jQuery("#theme_id").attr('tname',jQuery(this).attr('tname'));
-                        UIkit.modal('#AnsardemoPreview').hide();
                         // UIkit.modal('#Confirm').show();
                         $('#ImportConfirm').css('display', 'flex');
+                        $('#ansar-import-options').removeAttr('style');
 
                         if(jQuery('.theme').hasClass("focus")){
                             jQuery('.theme').removeClass("focus");
@@ -252,80 +504,8 @@ jQuery(document).ready(function ($) {
                 
                     });
                 }else{
-                    jQuery('#ans-infinity-load').parent().remove();
+                    jQuery('#ansar-infinity-load').parent().remove();
                 }
-
-                // jQuery('#ans-infinity-load').parent().remove();
-                // var div = document.createElement("div");
-                // var load_a = document.createElement("a");
-                // div.setAttribute("id", "ans-ss");
-                // load_a.setAttribute("id", "ans-infinity-load");
-                // load_a.innerHTML = "<i class='dashicons dashicons-update spinning'></i>";
-
-                // div.appendChild(load_a);
-                // // console.log(div);
-                // // console.log(response['html']);
-                // if(type == 'gridContent'){
-                //     jQuery('#grid').append(response['html']);
-                //     if(response['due_post'] > 0){
-                //         div.setAttribute("id", "gridContent");
-                //         div.setAttribute("paged", response['paged']);
-                //         if (typeof cat !== 'undefined') {
-                //           div.setAttribute("cat_archive", cat);
-                //         }else if (typeof tag !== 'undefined') {
-                //           div.setAttribute("tag_archive", tag);
-                //         }else if (typeof date !== 'undefined') {
-                //           div.setAttribute("date_archive", date);
-                //         }
-                //         jQuery('#grid').append(div);
-                //         loop = true;
-                //     }else{
-                //         if(i === 1){
-                //             console.log('no more post left');
-                //             var no_post_div = document.createElement("div");
-                //             var no_post = document.createElement("p");
-                //             no_post_div.setAttribute("class", "text-center");
-                //             no_post.setAttribute("id", "ans-infinity-load-no-post");
-                //             no_post.innerHTML = "No More Posts Left";
-                //             no_post_div.appendChild(no_post);
-                //             jQuery( '#grid').append(no_post_div);
-                //             i++;
-                //         }
-                //     }
-                // }else{
-                //     jQuery( 'body' ).find('.align_cls').append(response['html']);
-                //     if(response['due_post'] > 0){
-                //         div.setAttribute("id", "alignContent");
-                //         div.setAttribute("paged", response['paged']);
-                //         if (typeof cat !== 'undefined') {
-                //           div.setAttribute("cat_archive", cat);
-                //         }else if (typeof tag !== 'undefined') {
-                //           div.setAttribute("tag_archive", tag);
-                //         }else if (typeof date !== 'undefined') {
-                //           div.setAttribute("date_archive", date);
-                //         }
-                //         jQuery( 'body' ).find('.align_cls').append(div);
-                //         loop = true;
-                //     }else{
-                //         if(i === 1){
-                //             console.log('no more post left');
-                //             var no_post_div = document.createElement("div");
-                //             var no_post = document.createElement("p");
-                //             no_post_div.setAttribute("class", "text-center");
-                //             no_post.setAttribute("id", "ans-infinity-load-no-post");
-                //             no_post.innerHTML = "No More Posts Left";
-                //             no_post_div.appendChild(no_post);
-                //             jQuery( 'body' ).find('.align_cls').append(no_post_div);
-                //             i++;
-                //         }
-                //     }
-                // }
-
-                // let observer1 = lozad('.lozad', {
-                //     threshold: 0.1, // ratio of element convergence
-                //     enableAutoReload: true // it will reload the new image when validating attributes changes
-                // });
-                // observer1.observe();
                 
             },
             complete: function() {

@@ -3,9 +3,9 @@ Contributors: Themeansar
 Tags: theme demos, demo, importer, one click import
 Requires at least: 5.4
 Requires PHP: 7.4
-Tested up to: 6.8.1
-Stable tag: 2.0.2
-Version: 2.0.2
+Tested up to: 6.8
+Stable tag: 2.0.3
+Version: 2.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -149,3 +149,6 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 2.0.2 - 02-7-2025 =
 * Fixed some glitch.
+
+= 2.0.3 - 15-7-2025 =
+* Added Demo Import Progress bar.

@@ -3,13 +3,13 @@
  * Plugin Name:       Ansar Import
  * Plugin URI:        https://themeansar.com/
  * Description:       Ansar Import for Importing demo data Themeansar Theme.
- * Version:           2.0.2
+ * Version:           2.0.3
  * Author:            Themeansar
- * Requires at least: 4.0
- * Requires PHP:      5.2
+ * Requires at least: 5.4
+ * Requires PHP:      7.4
  * Author URI:        https://themeansar.com/
  * Text Domain:       ansar-import
- * Tested up to:      6.8.1
+ * Tested up to:      6.8
  * Domain Path:       /languages
  * License:           GNU General Public License v3.0
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,7 +17,7 @@
 // If this file is called directly, abort.
 if (!defined('WPINC')) { die; }
 
-define('ANSAR_IMPORT_VERSION', '2.0.0');
+define('ANSAR_IMPORT_VERSION', '2.0.3');
 define('ANSAR_IMPORT_FILE', __FILE__);
 define('ANSAR_IMPORT_DIR_PATH', plugin_dir_path(ANSAR_IMPORT_FILE));
 define('ANSAR_IMPORT_DIR_URL', plugin_dir_url(ANSAR_IMPORT_FILE));
