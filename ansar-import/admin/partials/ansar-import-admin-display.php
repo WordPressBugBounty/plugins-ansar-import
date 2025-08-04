@@ -10,10 +10,114 @@
  * @package    Ansar_Import
  * @subpackage Ansar_Import/admin/partials
  */
-?>
-<?php $tehme_data = wp_get_theme();
 
-if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 'Themeansar') {
+
+$pro_urls = [
+    'Newsxo'        => 'https://themeansar.com/themes/newsxo-pro-magazine-blog-wordpress-theme/',
+    'Blogier'       => 'https://themeansar.com/themes/blogier-pro-minimal-blog-magazine-wordpress-theme/',
+    'NewsPaperup'   => 'https://themeansar.com/themes/newspaperup-pro-magazine-blog-wordpress-theme/',
+    'BlogData'      => 'https://themeansar.com/themes/blogdata-pro-minimal-blog-magazine-wordpress-theme/',
+    'NewsAir'       => 'https://themeansar.com/themes/newsair-pro/',
+    'BlogArise'     => 'https://themeansar.com/themes/blogarise-pro/',
+    'Blogus'        => 'https://themeansar.com/themes/blogus-pro/',
+    'Fameup'        => 'https://themeansar.com/themes/fameup-pro/',
+    'Industryup'    => 'https://themeansar.com/themes/industryup-pro/',
+    'Consultco'     => 'https://themeansar.com/themes/consultco-pro/',
+    'Agencyup'      => 'https://themeansar.com/themes/agencyup-pro/',
+    'Newses'        => 'https://themeansar.com/themes/newses-pro/',
+    'Newsup'        => 'https://themeansar.com/themes/newsup-pro/',
+    'Consultup'     => 'https://themeansar.com/themes/consultup-pro/',
+    'Short'         => 'https://themeansar.com/themes/short-pro/',
+    'Yoga'          => 'https://themeansar.com/themes/yoga-wordpress-theme/',
+    'Businessup'    => 'https://themeansar.com/themes/businessup-pro/',
+    'Transportex'   => 'https://themeansar.com/themes/transportex-pro/',
+    'Shopress'      => 'https://themeansar.com/themes/shopress-pro/',
+    'Bizwhoop'      => 'https://themeansar.com/themes/bizwhoop-wordpress-theme/',
+    'Proficiency'   => 'https://themeansar.com/themes/proficiency-one-page-business-theme/',
+    'Ferry'         => 'https://themeansar.com/themes/ferry-woocommerce-wordpress-theme/',
+    'Financeup'     => 'https://themeansar.com/themes/financeup/',
+    'Shopbiz'       => 'https://themeansar.com/themes/shopbiz/',
+];
+
+$doc_urls = [
+    'Newsxo'            => 'https://docs.themeansar.com/docs/newsxo-lite/',
+    'Newsxo Pro'        => 'https://docs.themeansar.com/docs/newsxo-pro/',
+    'Blogier'           => 'https://docs.themeansar.com/docs/blogus-lite/',
+    'Blogier Pro'       => 'https://docs.themeansar.com/docs/blogier-pro/',
+    'NewsPaperup'       => 'https://docs.themeansar.com/docs/newspaperup-lite/',
+    'NewsPaperup Pro'   => 'https://docs.themeansar.com/docs/newspaperup-pro/',
+    'BlogData'          => 'https://docs.themeansar.com/docs/blogdata-lite/',
+    'BlogData Pro'      => 'https://docs.themeansar.com/docs/blogdata-pro/',
+    'NewsAir'           => 'https://docs.themeansar.com/docs/newsair-lite/',
+    'NewsAir Pro'       => 'https://docs.themeansar.com/docs/newsair-pro/',
+    'BlogArise'         => 'https://docs.themeansar.com/docs/blogarise-lite/',
+    'BlogArise Pro'     => 'https://docs.themeansar.com/docs/blogarise-pro/',
+    'Blogus'            => 'https://docs.themeansar.com/docs/blogus-lite/',
+    'Blogus Pro'        => 'https://docs.themeansar.com/docs/blogus-pro/',
+    'Fameup'            => 'https://docs.themeansar.com/docs/fameup-pro/',
+    'Fameup Pro'        => 'https://docs.themeansar.com/docs/fameup-pro/',
+    'Industryup'        => 'https://docs.themeansar.com/docs/industryup-pro/',
+    'Industryup Pro'    => 'https://docs.themeansar.com/docs/industryup-pro/',
+    'Consultco'         => 'https://docs.themeansar.com/docs/consultco-pro/',
+    'Consultco Pro'     => 'https://docs.themeansar.com/docs/consultco-pro/',
+    'Agencyup'          => 'https://docs.themeansar.com/docs/agencyup-lite/',
+    'Agencyup Pro'      => 'https://docs.themeansar.com/docs/agencyup-pro/',
+    'Newses'            => 'https://docs.themeansar.com/docs/newses-pro/',
+    'Newses Pro'        => 'https://docs.themeansar.com/docs/newses-pro/',
+    'Newsup'            => 'https://docs.themeansar.com/docs/newsup-lite/',
+    'Newsup Pro'        => 'https://docs.themeansar.com/docs/newsup-pro/',
+    'Consultup'         => 'https://docs.themeansar.com/docs/consultup-pro/',
+    'Consultup Pro'     => 'https://docs.themeansar.com/docs/consultup-pro/',
+    'Short'             => 'https://docs.themeansar.com/docs/short-pro/',
+    'Short Pro'         => 'https://docs.themeansar.com/docs/short-pro/',
+    'Yoga'              => 'https://docs.themeansar.com/docs/yoga-pro/',
+    'Yoga Pro'          => 'https://docs.themeansar.com/docs/yoga-pro/',
+    'Businessup'        => 'https://docs.themeansar.com/docs/businessup-pro/',
+    'Businessup Pro'    => 'https://docs.themeansar.com/docs/businessup-pro/',
+    'Transportex'       => 'https://docs.themeansar.com/docs/transportex-pro/',
+    'Transportex Pro'   => 'https://docs.themeansar.com/docs/transportex-pro/',
+    'Shopress'          => 'https://docs.themeansar.com/docs/shopress-pro/',
+    'Shopress Pro'      => 'https://docs.themeansar.com/docs/shopress-pro/',
+    'Bizwhoop'          => 'https://docs.themeansar.com/',
+    'Bizwhoop Pro'      => 'https://docs.themeansar.com/',
+    'Proficiency'       => 'https://docs.themeansar.com/',
+    'Proficiency Pro'   => 'https://docs.themeansar.com/',
+    'Ferry'             => 'https://docs.themeansar.com/',
+    'Ferry Pro'         => 'https://docs.themeansar.com/',
+    'Financeup'         => 'https://docs.themeansar.com/docs/financeup-pro/',
+    'Financeup Pro'     => 'https://docs.themeansar.com/docs/financeup-pro/',
+    'Shopbiz'           => 'https://docs.themeansar.com/docs/shopbiz-pro/',
+    'Shopbiz Pro'       => 'https://docs.themeansar.com/docs/shopbiz-pro/',
+];
+
+$theme_data = wp_get_theme();
+$current_pro_url = '';
+$current_doc_url = '';
+$parent = $theme_data->parent();
+
+if ( $parent && $theme_data->get('Name') !== 'Blogier' ) {
+    $tname = $parent->get('Name');
+} else {
+    $tname = $theme_data->get('Name');
+}
+foreach ($pro_urls as $name => $url) {
+    if($name == $tname){
+        $current_pro_url = $url;
+        break;
+    }else{
+        $current_pro_url = 'https://themeansar.com/themes';
+    }
+}
+foreach ($doc_urls as $name => $url) {
+    if($name == $tname){
+        $current_doc_url = $url;
+        break;
+    }else{
+        $current_doc_url = 'https://docs.themeansar.com';
+    }
+}
+
+if ($theme_data->get('Author') != 'themeansar' && $theme_data->get('Author') != 'Themeansar') {
     echo '<h3>' . wp_kses_post(__('Ansar Import - This plugin requires Official <a href="https://themeansar.com/">Theme Ansar</a> Theme to be activated to work.', 'ansar-import')) . '</h3>';
 
     //Adding @ before will prevent XDebug output
@@ -31,8 +135,20 @@ if ($tehme_data->get('Author') != 'themeansar' && $tehme_data->get('Author') != 
             <div class="ansar-version">
                 <span><?php echo ANSAR_IMPORT_VERSION; ?></span>
             </div>
+            <div class="ansar-doc">
+                <a href="<?php echo esc_url($current_doc_url); ?>" target="_blank" tooltip="Docs">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 24 24" fill="none" style="&#10;    stroke: #505c66;&#10;">
+                            <path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" stroke="#1C274C" stroke-width="1.5" style="&#10;    opacity: 1;&#10;    stroke: #505c66;&#10;"/>
+                            <path d="M8 12H16" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" style="&#10;    stroke: #505c66;&#10;"/>
+                            <path d="M8 8H16" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" style="stroke: #505c66;"/>
+                            <path d="M8 16H13" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" style="stroke: #505c66;"/>
+                        </svg>
+                    </span>
+                </a>
+            </div>
             <div class="ansar-feature-pro">
-                <a href="https://themeansar.com/themes/" target="_blank" title="Upgrade to Pro">
+                <a href="<?php echo esc_url($current_pro_url); ?>" target="_blank" title="Upgrade to Pro">
                     <span class="ansar-pro-icon"><svg
                             xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 24 24"
                             fill="none" style="fill: #fff;">

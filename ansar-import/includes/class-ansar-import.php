@@ -716,18 +716,33 @@ class Ansar_Import {
 
         //   echo 'Fixing Menu . .<br>';
 
-        $menu = wp_get_nav_menus();
+        // Get all menus
+        $menus = wp_get_nav_menus();
 
-        $locations = get_theme_mod('nav_menu_locations');
+        // Define your target location key (usually defined in the theme)
+        $target_location_key = 'primary'; // change if your theme uses something else
 
-        foreach ($menu as $menu_key => $menu_value) {
-            if (array_key_exists($menu_value->name, $locations)) {
-                //  echo "Found the Key";
-                $locations[$menu_value->name] = $menu_value->term_id;
+        // Try to find the menu you want to assign
+        $target_menu = null;
+        foreach ($menus as $menu) {
+            if (strtolower($menu->name) === 'primary' || strtolower($menu->slug) === 'primary' || strtolower($menu->slug) === 'main-menu') {
+                $target_menu = $menu;
+                break;
             }
         }
 
-        set_theme_mod('nav_menu_locations', $locations);
+        // If found, assign to location
+        if ($target_menu) {
+            $locations = get_theme_mod('nav_menu_locations');
+
+            if (!is_array($locations)) {
+                $locations = [];
+            }
+
+            $locations[$target_location_key] = $target_menu->term_id;
+
+            set_theme_mod('nav_menu_locations', $locations);
+        }
 
         // echo 'Seting Home and Blog page . .<br>';
         // Get "Home" page by its path

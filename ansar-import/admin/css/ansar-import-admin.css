@@ -203,8 +203,8 @@ left: 50%;
 }
 .ansar-admin-right-area {
     display: flex;
-    align-items: baseline;
-    gap: 40px;
+    align-items: center;
+    gap: 25px;
 }
 .ansar-admin-right-area > div {
     position: relative;
@@ -213,13 +213,61 @@ left: 50%;
     color: #666;
     display: inline-block;
 }
-.ansar-admin-right-area > div:not(:last-child)::before {
+.ansar-admin-right-area .ansar-doc a {
+    position: relative;
+}
+.ansar-admin-right-area .ansar-doc a:focus {
+    box-shadow: none;
+    outline: none;
+    border: none;
+}
+.ansar-admin-right-area .ansar-doc a::before{
+    content: attr(tooltip);
+    position: absolute;
+    background-color: #000;
+    color: #fff;
+    top: -25px;
+    padding: 0px 10px;
+    border-radius: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    font-weight: 600;
+}
+.ansar-admin-right-area .ansar-doc a::after{
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: #000;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    opacity: 0;
+}
+.ansar-admin-right-area .ansar-doc a:hover::before,.ansar-admin-right-area .ansar-doc a:hover::after{
+    opacity: 1;
+    transition: 0.35s;
+}
+.ansar-admin-right-area .ansar-doc span {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+}
+/* .ansar-admin-right-area > div:not(:last-child)::before {
     content: '';
     position: absolute;
     height: 16px;
     width: 1px;
     background-color: #ccc;
     right: -20px;
+} */
+ .ansar-admin-right-area .ansar-version {
+    background: #EAECF1;
+    color: #4e5963;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 600;
 }
 .ansar-admin-right-area .ansar-feature-pro a {
     display: flex;
