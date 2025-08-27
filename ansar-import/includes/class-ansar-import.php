@@ -289,15 +289,35 @@ class Ansar_Import {
             $theme_data_api = json_decode($theme_data_api_body, TRUE);
             
             
-            //Getting Demo files from url
-            if($content !== 'false' ){
-                file_put_contents($upload['basedir'] . '/ansar_import_data/data.xml', fopen($theme_data_api['data_file_url'], 'r'));
+            // Getting Demo files from URL using wp_remote_get
+            if ( $content !== 'false' ) {
+                $response = wp_remote_get( esc_url_raw( $theme_data_api['data_file_url'] ), array( 'timeout' => 30 ) );
+                if ( ! is_wp_error( $response ) ) {
+                    $body = wp_remote_retrieve_body( $response );
+                    if ( ! empty( $body ) ) {
+                        file_put_contents( trailingslashit( $upload['basedir'] ) . 'ansar_import_data/data.xml', $body );
+                    }
+                }
             }
-            if($widget !== 'false' ){
-                file_put_contents($upload['basedir'] . '/ansar_import_data/widgets.wie', fopen($theme_data_api['widget_file_url'], 'r'));
+
+            if ( $widget !== 'false' ) {
+                $response = wp_remote_get( esc_url_raw( $theme_data_api['widget_file_url'] ), array( 'timeout' => 30 ) );
+                if ( ! is_wp_error( $response ) ) {
+                    $body = wp_remote_retrieve_body( $response );
+                    if ( ! empty( $body ) ) {
+                        file_put_contents( trailingslashit( $upload['basedir'] ) . 'ansar_import_data/widgets.wie', $body );
+                    }
+                }
             }
-            if($customize !== 'false' ){
-                file_put_contents($upload['basedir'] . '/ansar_import_data/customizer.dat', fopen($theme_data_api['customizer_file_url'], 'r'));
+
+            if ( $customize !== 'false' ) {
+                $response = wp_remote_get( esc_url_raw( $theme_data_api['customizer_file_url'] ), array( 'timeout' => 30 ) );
+                if ( ! is_wp_error( $response ) ) {
+                    $body = wp_remote_retrieve_body( $response );
+                    if ( ! empty( $body ) ) {
+                        file_put_contents( trailingslashit( $upload['basedir'] ) . 'ansar_import_data/customizer.dat', $body );
+                    }
+                }
             }
 
             //remove current home page if exsist
