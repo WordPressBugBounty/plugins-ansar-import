@@ -85,7 +85,7 @@ class Ansar_Import {
         $theme = wp_get_theme();
         $author = $theme->get('Author');
 
-        if ( $author !== 'Themeansar' ) {
+        if ( $author !== 'Themeansar' && $author !== 'themeansar' ) {
             add_action("admin_notices", [$this, "ta_theme_notice"]);
         }
     }

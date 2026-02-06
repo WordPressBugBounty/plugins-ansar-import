@@ -57,65 +57,47 @@
 </h1>
 
 <?php
-$cat_data = wp_remote_get(esc_url_raw('https://api.themeansar.com/wp-json/wp/v2/categories?_fields=id,name,slug&post_type=demos&per_page=50&exclude=1'), [ 'timeout' => 15 ]);
-$cat_data_body = wp_remote_retrieve_body($cat_data);
-$all_categories = json_decode($cat_data_body, TRUE);
-$random_seed = rand(1, 1000);
-
-//print_r($all_demos);
 $theme_data = wp_get_theme();
 $theme_name = $theme_data->get('Name');
 $theme_slug = $theme_data->get('TextDomain');
 
-$theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/?orderby=rand&seed=$random_seed&per_page=12"), [ 'timeout' => 15 ]);
+$theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos?categories=15&per_page=100"), [ 'timeout' => 15 ]);
 
 $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
 $all_demos = json_decode($theme_data_api_body, TRUE);
+// print_r($all_demos);
 
-
-if ($all_demos === null || $all_categories === null) { ?>
+if ($all_demos === null) { ?>
     <script type="text/javascript">
         location.reload(true);
     </script>
 <?php }
 
 if (count($all_demos) == 0) {
-    wp_die('This theme is not supported yet!');
+    wp_die('This Plugin is not supported yet!');
 }
 
+$first_match_found = false;
 ?>
 
 <hr class="wp-header-end">
 <div class="theme-browser rendered demo-ansar-container">
     <div class="themes wp-clearfix">
         <div uk-filter="target: .js-filter">
-            <!-- Filter Controls -->
-            <ul class="uk-subnav uk-subnav-pill">
-                <li class="uk-active" uk-filter-control><a href="#">All</a></li>
-                <?php foreach ($all_categories as $category) { if($category['slug'] == 'uncategorized'){ continue; } ?>
-                    <li uk-filter-control="[data-color*='cat_<?php echo esc_html($category['id']); ?>']"><a href="#"><?php echo esc_attr($category['name']); ?></a></li>
-                <?php } ?>
-            </ul>
-            <!-- / Filter Controls -->
 
             <div class="js-filter grid-wrap">
 
                 <?php 
-                    //  print_r($theme_name);
-
-                foreach ($all_demos as $demo) {  $c = 0; 
-                    //  print_r($demo['theme_name']);
-                 ?>
+                foreach ($all_demos as $demo) {  $c = 0; ?>
                     <div class="ansar-inner-box" data-color="<?php
                         foreach ($demo['categories'] as $in_cat) {
                             echo "cat_" . esc_attr($in_cat['id']) . " ";
                         }
-                    ?>">
-                    
+                    ?>"<?php if( ($theme_name == $demo['theme_name']) && $first_match_found === false ){ echo ' data-first-demo';  $first_match_found = true; }?>>
                         <!-- product -->
                         <div class="uk-card theme" style="width: 100%;" tabindex="0">
                             <div class="theme-screenshot">
-                                <?php if (((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) && ($theme_name != $demo['theme_name'])) { ?>
+                                <?php if ($demo['theme_type'] === 'pro' && ! is_plugin_active('blognews-for-elementor-pro/blognews-for-elementor.php')) { ?>
                                     <span class="ribbon pro">
                                         <?php esc_html_e('Pro','ansar-import'); ?>
                                     </span>
@@ -132,7 +114,7 @@ if (count($all_demos) == 0) {
                             <div class="theme-author"><?php esc_html_e('By Themeansar','ansar-import'); ?> </div>
                             <div class="theme-id-container">
                                 <div class="theme-names-about">
-                                    <h2 class="theme-name" id=""><?php echo esc_attr($demo['title']['rendered']); ?></h2>
+                                    <h2 class="theme-name" id=""><?php echo esc_attr($demo['demo_name']); ?></h2>
                                     <?php $lastcat = end($demo['categories']);
                                         foreach ($demo['categories'] as $in_cat) {
                                         if($c == 0){
@@ -148,15 +130,17 @@ if (count($all_demos) == 0) {
                                 </div>
                                 <div class="theme-actions">
 
-                                    <?php if (((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) && ($theme_name != $demo['theme_name'])) { ?>
+                                    <?php if ($demo['theme_type'] === 'pro' && ! is_plugin_active('blognews-for-elementor-pro/blognews-for-elementor.php')) { ?>
                                         <a class="button activate" target="_new" href="<?php echo esc_url($demo['pro_link']); ?>" >
                                             <?php esc_html_e('Buy Now','ansar-import'); ?>
                                         </a>
                                     <?php } else { ?>
-                                        <a class="button activate live-btn-<?php echo absint($demo['id']); ?> uk-hidden " target="_new" data-id="<?php echo absint($demo['id']); ?>"  href="<?php echo esc_url(home_url()); ?>">Live Preview</a>
-                                        <button type="button" class="button activate btn-import btn-import-<?php echo absint($demo['id']); ?>" href="#" data-id="<?php echo absint($demo['id']); ?>" tname="<?php echo esc_attr(strtolower(str_replace(' ', '-', $demo['theme_name']))); ?>">
-                                            <?php esc_html_e('Import','ansar-import'); ?>
-                                        </button>
+                                            <a class="button activate live-btn-<?php echo absint($demo['id']); ?> <?php  if(get_option( 'ansar_demo_installed' )!= $demo['id']){ echo "uk-hidden"; }?> " target="_new" data-id="<?php echo absint($demo['id']); ?>"  href="<?php echo esc_url(home_url()); ?>">
+                                                Live Preview
+                                            </a>
+                                            <button type="button" class="<?php  if(get_option( 'ansar_demo_installed' )== $demo['id']){ echo "uk-hidden"; }?> button activate btn-import btn-import-<?php echo absint($demo['id']); ?>" href="#" data-id="<?php echo absint($demo['id']); ?>">
+                                                <?php esc_html_e('Import','ansar-import'); ?>
+                                            </button>
                                     <?php }  ?>
                                     <a class="button button-primary load-customize hide-if-no-customize" href="<?php echo esc_url($demo['preview_link']); ?>" target="_blank">
                                         <?php esc_html_e('Preview','ansar-import'); ?>
@@ -176,9 +160,6 @@ if (count($all_demos) == 0) {
         </div>
     </div>
 
-    <div id="ans-ss-loading" paged="1" >
-        <a id="ansar-infinity-load" seed="<?php echo esc_attr($random_seed); ?>" ><i class="dashicons dashicons-update spinning"></i></a>
-    </div>
 </div>
 
 <!-- Modal preview  End -->
@@ -232,9 +213,6 @@ if (count($all_demos) == 0) {
                         <progress class="progress" value="0" max="100">0%</progress>
                     </div>
                     <ul class="ansar-import-tabs" id="ansar_import_tabs">
-                        <li class="tab_disabled dashicons" id="theme_step">
-                            <a href="#">Required Theme Checking</a>
-                        </li>
                         <li class="tab_disabled dashicons" id="demo_file_step">
                             <a href="#">Checking Theme Data Files</a>
                         </li>

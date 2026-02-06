@@ -3,9 +3,9 @@ Contributors: Themeansar
 Tags: theme demos, demo, importer, one click import
 Requires at least: 6.6
 Requires PHP: 7.4
-Tested up to: 6.8
-Stable tag: 2.0.5
-Version: 2.0.5
+Tested up to: 6.9
+Stable tag: 2.1.0
+Version: 2.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -158,3 +158,18 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 2.0.5 - 27-8-2025 =
 * Fixed Importing Issue.
+
+= 2.0.6 - 04-11-2025 =
+* Added Newseblog theme layout.
+
+= 2.0.7 - 11-11-2025 =
+* Fixed some issue.
+
+= 2.0.8 - 12-11-2025 =
+* Fixed importing demo issue from starter sites tab.
+
+= 2.0.9 - 25-11-2025 =
+* Fixed Demos Placing Issue.
+
+= 2.1.0 - 26-12-2025 =
+* Tested On WordPress 6.9.

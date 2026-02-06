@@ -80,9 +80,24 @@ class Ansar_Import_Admin {
         add_menu_page('Ansar Import', 'Ansar Import', 'manage_options', 'ansar-starter-sites', array($this, 'starter_sites_page'), $starter_icon , 20);
         
         add_submenu_page('ansar-starter-sites', 'Starter Sites', 'Starter Sites', 'manage_options', 'ansar-starter-sites');
+
+        $current_theme = wp_get_theme()->get('Name');
+        $excluded_themes = array( 'NewseBlog', 'Penpress', 'NewsHash' );
         
-        if(wp_get_theme()->get('Author') == 'themeansar' || wp_get_theme()->get('Author') == 'Themeansar'){
-            add_submenu_page('ansar-starter-sites', 'Theme Demos', 'Theme Demos', 'manage_options', 'ansar-demo-import', array($this, 'theme_option_page'));
+        if ( ! in_array( $current_theme, $excluded_themes ) ) {
+            if(wp_get_theme()->get('Author') == 'themeansar' || wp_get_theme()->get('Author') == 'Themeansar'){
+                add_submenu_page('ansar-starter-sites', 'Theme Demos', 'Theme Demos', 'manage_options', 'ansar-demo-import', array($this, 'theme_option_page'));
+            }
+        }
+        if ( is_plugin_active('blognews-for-elementor/blognews-for-elementor.php') || is_plugin_active('blognews-for-elementor-pro/blognews-for-elementor.php') ) {
+            add_submenu_page(
+                'ansar-starter-sites',
+                'BlogNews Demos',
+                'BlogNews Demos',
+                'manage_options',
+                'ansar-plugin-demos',
+                array($this, 'plugin_demos_page')
+            );
         }
     }
     
@@ -154,6 +169,15 @@ class Ansar_Import_Admin {
     }
 
     /**
+     * Render the plugin demo page for plugin
+     *
+     * @since  1.0.0
+     */
+    public function plugin_demos_page() {
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/ansar-plugin-sites-display.php';
+    } 
+
+    /**
      * Render the starter sites page for plugin
      *
      * @since  1.0.0
@@ -181,7 +205,7 @@ class Ansar_Import_Admin {
          * between the defined hooks and the functions defined in this
          * class.
          */
-        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import' ) {
+        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import' || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-plugin-demos' ) {
             wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/ansar-import-admin.css', array(), $this->version, 'all');
             wp_enqueue_style('uikit', plugin_dir_url(__FILE__) . 'css/uikit.min.css', array(), $this->version, 'all');
             wp_enqueue_style('theme');
@@ -208,7 +232,7 @@ class Ansar_Import_Admin {
          * class.
          */
         //$themes = wp_prepare_themes_for_js( array( wp_get_theme() ) );
-        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import' ) {
+        if ( (isset( $screen->base ) && $screen->base == 'toplevel_page_ansar-starter-sites' ) || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-demo-import' || isset( $screen->base ) && $screen->base == 'ansar-import_page_ansar-plugin-demos' ) {
             remove_all_actions( 'admin_notices' );
             wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/ansar-import-admin.js', array('jquery'), $this->version, false);
             wp_enqueue_script('uikit-js', plugin_dir_url(__FILE__) . 'js/uikit.min.js', array('jquery'), $this->version, false);

@@ -6,7 +6,7 @@
     <!-- product -->
     <div class="uk-card theme" style="width: 100%;" tabindex="0">
         <div class="theme-screenshot">
-            <?php if ((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) { ?>
+            <?php if (((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) && ($theme_name != $demo['theme_name'])) { ?>
                 <span class="ribbon pro">
                     <?php esc_html_e('Pro','ansar-import'); ?>
                 </span>
@@ -40,7 +40,7 @@
             </div>
             <div class="theme-actions">
 
-                <?php if ((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) { ?>
+                <?php if (((strpos($demo['theme_name'], 'pro') !== false) || (strpos($demo['theme_name'], 'Pro') !== false) || (strpos($demo['theme_name'], 'PRO') !== false)) && ($theme_name != $demo['theme_name'])) { ?>
                     <a class="button activate" target="_new" href="<?php echo esc_url($demo['pro_link']); ?>" >
                         <?php esc_html_e('Buy Now','ansar-import'); ?>
                     </a>
