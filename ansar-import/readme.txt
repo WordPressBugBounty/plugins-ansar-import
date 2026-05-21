@@ -3,9 +3,9 @@ Contributors: Themeansar
 Tags: theme demos, demo, importer, one click import
 Requires at least: 6.6
 Requires PHP: 7.4
-Tested up to: 6.9
-Stable tag: 2.1.0
-Version: 2.1.0
+Tested up to: 7.0
+Stable tag: 2.1.1
+Version: 2.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -173,3 +173,6 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 2.1.0 - 26-12-2025 =
 * Tested On WordPress 6.9.
+
+= 2.1.1 - 21-05-2026 =
+* Tested On WordPress 7.0
