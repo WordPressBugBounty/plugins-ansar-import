@@ -3,7 +3,7 @@
  * Plugin Name:       Ansar Import
  * Plugin URI:        https://themeansar.com/
  * Description:       Ansar Import for Importing demo data Themeansar Theme.
- * Version:           2.1.1
+ * Version:           2.1.2
  * Author:            Themeansar
  * Requires at least: 6.6
  * Requires PHP:      7.4

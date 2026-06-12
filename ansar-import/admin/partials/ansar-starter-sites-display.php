@@ -132,7 +132,7 @@ if (count($all_demos) == 0) {
                             <div class="theme-author"><?php esc_html_e('By Themeansar','ansar-import'); ?> </div>
                             <div class="theme-id-container">
                                 <div class="theme-names-about">
-                                    <h2 class="theme-name" id=""><?php echo esc_attr($demo['title']['rendered']); ?></h2>
+                                    <h2 class="theme-name" id="" title="<?php echo esc_attr($demo['title']['rendered']); ?>"><?php echo esc_attr($demo['title']['rendered']); ?></h2>
                                     <?php $lastcat = end($demo['categories']);
                                         foreach ($demo['categories'] as $in_cat) {
                                         if($c == 0){

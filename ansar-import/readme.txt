@@ -1,11 +1,11 @@
-=== Ansar Import – One Click Demo Import for WordPress Themes ===
+=== Ansar Import – One Click Starter Sites – for Elementor & Themes ===
 Contributors: Themeansar
-Tags: theme demos, demo, importer, one click import
+Tags: elementor,theme demos, landing page, templates, one click import
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 7.0
-Stable tag: 2.1.1
-Version: 2.1.1
+Stable tag: 2.1.2
+Version: 2.1.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -43,6 +43,17 @@ Go to Appearance > Ansar Import.
 Select a demo and click "Import."
 
 Your site is ready with demo content and layout.
+
+= Readymade Elementor Starter Sites Built For =
+ 
+News websites Â· Online magazines Â· Bloggers Â· Content publishers Â· Editorial sites Â· Personal blogs
+
+[**Starter Sites**](https://themeansar.com/ansar-elements/starter-sites/)
+
+= What Nexts =
+
+If you like , then consider checking out our other WordPress Plugins:
+[**Ansar Elements**](https://wordpress.org/plugins/ansar-elements/) “ Fastest Elementor addon in the WordPress repository.
 
 == Installation ==
 
@@ -176,3 +187,6 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 2.1.1 - 21-05-2026 =
 * Tested On WordPress 7.0
+
+= 2.1.2 - 11-06-2026 =
+* Fixed Styling issues.
