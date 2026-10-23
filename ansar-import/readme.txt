@@ -1,11 +1,11 @@
-=== Ansar Import – One Click Starter Sites – for Elementor & Themes ===
+=== Ansar Import – One Click Starter Sites – for WordPress Themes ===
 Contributors: Themeansar
-Tags: elementor,theme demos, landing page, templates, one click import
+Tags: theme demos, landing page, templates, one click import
 Requires at least: 6.6
 Requires PHP: 7.4
-Tested up to: 7.0
-Stable tag: 2.1.2
-Version: 2.1.2
+Tested up to: 7.1.2
+Stable tag: 2.1.3
+Version: 2.1.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -17,25 +17,25 @@ Ansar Import is a simple yet powerful one-click demo importer plugin for WordPre
 
 Perfect for theme users and agencies alike, Ansar Import helps you skip manual setups by importing demo content, widgets, menus, settings, templates, and theme customizations automatically.
 
-🚀 Key Features:
-✅ One Click Import – Quickly set up your site just like the theme demo.
+Key Features:
+One Click Import – Quickly set up your site just like the theme demo.
 
-🧱 Supports FSE & Block Themes – Seamless with Full Site Editing and Gutenberg.
+Supports FSE & Block Themes – Seamless with Full Site Editing and Gutenberg.
 
-🎨 Elementor Compatible – Easily import Elementor demo layouts and settings.
+Elementor Compatible – Easily import Elementor demo layouts and settings.
 
-🔄 Reusable Templates – Import custom templates, patterns, and starter designs.
+Reusable Templates – Import custom templates, patterns, and starter designs.
 
-📦 Media & Content – Import pages, posts, images, menus, and widgets.
+Media & Content – Import pages, posts, images, menus, and widgets.
 
-🧑‍💻 Developer-Friendly Hooks – Extend or customize import logic easily.
+Developer-Friendly Hooks – Extend or customize import logic easily.
 
-🧑‍💼 Who Is It For?
+Who Is It For?
 Web Designers & Agencies – Quickly scaffold websites from starter kits.
 
 DIY Website Owners – Set up your website like the preview in minutes.
 
-📚 How It Works:
+How It Works:
 Install and activate Ansar Import.
 
 Go to Appearance > Ansar Import.
@@ -52,8 +52,15 @@ News websites Â· Online magazines Â· Bloggers Â· Content publishers Â· E
 
 = What Nexts =
 
-If you like , then consider checking out our other WordPress Plugins:
-[**Ansar Elements**](https://wordpress.org/plugins/ansar-elements/) “ Fastest Elementor addon in the WordPress repository.
+Check out our other WordPress tools designed to enhance your workflow:
+
+**[Ansar Blocks](https://wordpress.org/plugins/ansar-blocks/)** – Enhance your WordPress block editor with powerful Gutenberg blocks, modules, and extensions. Build professional, responsive, and customizable websites faster with Ansar Blocks.
+
+**[Ansar Elements](https://wordpress.org/plugins/ansar-elements/)** – The ultimate toolkit for Elementor your WordPress site with modules and extensions.
+
+**[Ansar SEO](https://wordpress.org/plugins/ansar-seo/)** – for WordPress Onpage SEO extensions.
+
+Visit [ThemeAnsar](https://themeansar.com/) to discover how we empower WordPress creators.
 
 == Installation ==
 
@@ -190,3 +197,6 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 2.1.2 - 11-06-2026 =
 * Fixed Styling issues.
+
+= 2.1.3 - 06-10-2026 =
+* Update WordPress version and compatibility.
