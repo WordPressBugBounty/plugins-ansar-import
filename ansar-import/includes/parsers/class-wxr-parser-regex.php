@@ -9,7 +9,7 @@
 /**
  * WXR Parser that uses regular expressions. Fallback for installs without an XML parser.
  */
-class ANS_WXR_Parser_Regex {
+class ANSAR_IMPORT_WXR_Parser_Regex {
 	var $authors = array();
 	var $posts = array();
 	var $categories = array();
@@ -295,7 +295,7 @@ class ANS_WXR_Parser_Regex {
 	function fopen( $filename, $mode = 'r' ) {
 		if ( $this->has_gzip )
 			return gzopen( $filename, $mode );
-		return fopen( $filename, $mode );
+		return fopen( $filename, $mode ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Direct stream reading required for chunked XML parsing.
 	}
 
 	function feof( $fp ) {
@@ -313,6 +313,6 @@ class ANS_WXR_Parser_Regex {
 	function fclose( $fp ) {
 		if ( $this->has_gzip )
 			return gzclose( $fp );
-		return fclose( $fp );
+		return fclose( $fp ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Direct stream reading required for chunked XML parsing.
 	}
 }

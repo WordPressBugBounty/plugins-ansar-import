@@ -27,6 +27,9 @@
  * @subpackage Ansar_Import/includes
  * @author     Themeansar <info@themeansar.com>
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class Ansar_Import {
 
     /**
@@ -77,31 +80,6 @@ class Ansar_Import {
         $this->load_dependencies();
         $this->set_locale();
         $this->define_admin_hooks();
-        $this->define_public_hooks();
-        $this->ta_theme_author_check();
-    }
-    
-    function ta_theme_author_check() {
-        $theme = wp_get_theme();
-        $author = $theme->get('Author');
-
-        if ( $author !== 'Themeansar' && $author !== 'themeansar' ) {
-            add_action("admin_notices", [$this, "ta_theme_notice"]);
-        }
-    }
-    
-    function ta_theme_notice() {
-        $starter_sites_url = esc_url(admin_url('admin.php?page=ansar-starter-sites')); // Replace with your actual URL
-
-        echo '<div class="notice notice-warning is-dismissible">';
-        echo '<p>' . esc_html__(
-            "Please activate one of Themeansar Themes to use Ansar Import For Starter Sites.",
-            "ansar-import"
-        ) . '</p>';
-
-        echo '<p><a href="' . esc_attr($starter_sites_url) . '" class="button-primary">' .
-            esc_html__('Browse Starter Sites', 'ansar-import') . '</a></p>';
-        echo '</div>';
     }
     
     function is_theme_installed($theme_slug) {
@@ -110,7 +88,30 @@ class Ansar_Import {
     }
     
     function is_theme_active($theme_slug) {
-        return get_stylesheet() === $theme_slug;
+        if ( empty( $theme_slug ) ) {
+            return false;
+        }
+
+        $active_stylesheet = strtolower( (string) get_stylesheet() );
+        $active_template   = strtolower( (string) get_template() );
+        $check_slug        = strtolower( (string) $theme_slug );
+
+        // Direct match with active theme stylesheet or parent template
+        if ( $active_stylesheet === $check_slug || $active_template === $check_slug ) {
+            return true;
+        }
+
+        $theme_data = wp_get_theme();
+        if ( 0 === strcasecmp( $theme_data->get( 'Name' ), $theme_slug ) ) {
+            return true;
+        }
+
+        // Child theme support: verify if active theme's parent matches the required theme
+        if ( $theme_data->parent() && 0 === strcasecmp( $theme_data->parent()->get( 'Name' ), $theme_slug ) ) {
+            return true;
+        }
+
+        return false;
     }
     
     function install_and_activate_theme($theme_slug) {
@@ -211,10 +212,9 @@ class Ansar_Import {
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-ansar-import-admin.php';
 
         /**
-         * The class responsible for defining all actions that occur in the public-facing
-         * side of the site.
+         * Reusable engine modules.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-ansar-import-public.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/engine/plugin/class-ansar-plugin-manager.php';
 
         $this->loader = new Ansar_Import_Loader();
     }
@@ -235,15 +235,135 @@ class Ansar_Import {
         $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
     }
 
+    /**
+     * Sanitize and retrieve the demo asset URL.
+     *
+     * @param string $url Original asset URL.
+     * @return string Sanitized asset URL.
+     */
+    public static function get_cdn_url( $url ) {
+        return trim( (string) $url );
+    }
+
+    /**
+     * Build candidate URLs for downloading demo files.
+     *
+     * @param string $url Original file URL.
+     * @return array List of candidate URLs to try.
+     */
+    public static function get_demo_file_candidate_urls( $url ) {
+        $url = trim( (string) $url );
+        if ( '' === $url ) {
+            return array();
+        }
+
+        return array( $url );
+    }
+
+    /**
+     * Download a remote demo file (data.xml, widgets.wie, customizer.dat) with automatic CDN mirror failover.
+     *
+     * @param string $url     Remote file URL.
+     * @param int    $timeout Timeout per attempt in seconds.
+     * @return string|WP_Error Downloaded file body on success, WP_Error on failure.
+     */
+    private function download_demo_file_with_fallback( $url, $timeout = 60 ) {
+        $candidates = self::get_demo_file_candidate_urls( $url );
+        if ( empty( $candidates ) ) {
+            return new WP_Error( 'empty_url', __( 'Demo file URL is empty.', 'ansar-import' ) );
+        }
+
+        $last_error = null;
+
+        foreach ( $candidates as $candidate_url ) {
+            $response = wp_remote_get(
+                esc_url_raw( $candidate_url ),
+                array(
+                    'timeout'    => $timeout,
+                    'decompress' => true,
+                    'headers'    => array(
+                        'Accept' => '*/*',
+                    ),
+                )
+            );
+
+            // If download failed due to local SSL/CA certificate error (e.g. cURL error 60), retry with sslverify disabled.
+            if ( is_wp_error( $response ) ) {
+                $error_message = strtolower( (string) $response->get_error_message() );
+                if (
+                    false !== strpos( $error_message, 'ssl' ) ||
+                    false !== strpos( $error_message, 'certificate' ) ||
+                    false !== strpos( $error_message, 'curl error 60' ) ||
+                    false !== strpos( $error_message, 'curl error 77' ) ||
+                    false !== strpos( $error_message, 'local issuer certificate' )
+                ) {
+                    $response = wp_remote_get(
+                        esc_url_raw( $candidate_url ),
+                        array(
+                            'timeout'    => $timeout,
+                            'decompress' => true,
+                            'sslverify'  => false,
+                            'headers'    => array(
+                                'Accept' => '*/*',
+                            ),
+                        )
+                    );
+                }
+            }
+
+            if ( is_wp_error( $response ) ) {
+                $last_error = $response;
+                continue;
+            }
+
+            $code = (int) wp_remote_retrieve_response_code( $response );
+            if ( 200 !== $code ) {
+                $last_error = new WP_Error(
+                    'http_error',
+                    // translators: %d: HTTP response status code.
+                    sprintf( __( 'Demo server returned HTTP %d while downloading content files.', 'ansar-import' ), $code )
+                );
+                continue;
+            }
+
+            $body = wp_remote_retrieve_body( $response );
+            if ( empty( $body ) ) {
+                $last_error = new WP_Error(
+                    'empty_body',
+                    __( 'Downloaded demo content file is empty.', 'ansar-import' )
+                );
+                continue;
+            }
+
+            return $body;
+        }
+
+        return $last_error ? $last_error : new WP_Error( 'download_failed', __( 'Failed to download demo file.', 'ansar-import' ) );
+    }
+
     public function install_demo($theme_id, $customize = true, $widget = true, $content = true, $step = 'init', $theme = false) {
         
-        //Setting upload Dir
+        // Prevent timeout and memory exhaustion on heavy demo files
+        if ( function_exists( 'set_time_limit' ) ) {
+            // phpcs:disable Squiz.PHP.DiscouragedFunctions.Discouraged, WordPress.PHP.NoSilencedErrors.Discouraged -- Extended execution time needed for demo importing.
+            @set_time_limit( 300 );
+        }
+        if ( function_exists( 'wp_raise_memory_limit' ) ) {
+            wp_raise_memory_limit( 'admin' );
+        }
+
+        // Setting upload Dir safely
         $upload = wp_upload_dir();
-        $upload_dir = $upload['basedir'];
-        $upload_dir = $upload_dir . '/ansar_import_data';
-        if (!is_dir($upload_dir)) { mkdir($upload_dir, 0755); }
+        $upload_dir = trailingslashit( $upload['basedir'] ) . 'ansar_import_data';
+        if ( ! is_dir( $upload_dir ) ) {
+            wp_mkdir_p( $upload_dir );
+        }
     
         if($step == 'theme_init'){
+            if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+                wp_send_json_success(['status' => 'ok', 'msg' => 'Active block theme preserved.']);
+                return;
+            }
             if($theme !== false){
                 if($this->is_theme_installed($theme) == false || $this->is_theme_active($theme) == false){
                     $this->install_and_activate_theme($theme);
@@ -252,13 +372,26 @@ class Ansar_Import {
                 }
             }
         }
+
+        if($step == 'install_plugins'){
+            if (empty($theme_id)) {
+                wp_send_json_error(['status' => 'error', 'msg' => __('No theme id passed!', 'ansar-import')]);
+                return;
+            }
+            $plugin_manager = Ansar_Plugin_Manager::instance();
+            $result = $plugin_manager->install_required_plugins($theme_id);
+            if (isset($result['status']) && $result['status'] === 'error') {
+                wp_send_json_error($result);
+            } else {
+                wp_send_json_success($result);
+            }
+            return;
+        }
         
         if($step == 'demo_data_init'){
-            //sleep(15);
-            //die();
             if (empty($theme_id)) {
-                $importer_error = true;
-                $importer_error_msg = "No theme id passed!";
+                wp_send_json_error(array('status' => 'error', 'msg' => __('No valid theme ID provided for demo import.', 'ansar-import')));
+                return;
             }
 
             if($content !== 'false' ){
@@ -273,54 +406,69 @@ class Ansar_Import {
 
             // Load Importer API
             require_once ABSPATH . 'wp-admin/includes/import.php';
-            //check if wp_importer, the base importer class is available, otherwise include it
             if (!class_exists('WP_Importer')) {
                 $class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
                 if (file_exists($class_wp_importer)) {
                     require_once( $class_wp_importer );
-                } else {
-                    $importer_error = true;
                 }
             }
 
-            //Getting demo data
-            $theme_data_api = wp_remote_get(esc_url_raw("https://api.themeansar.com/wp-json/wp/v2/demos/" . $theme_id), [ 'timeout' => 15 ]);
-            $theme_data_api_body = wp_remote_retrieve_body($theme_data_api);
-            $theme_data_api = json_decode($theme_data_api_body, TRUE);
-            
-            
-            // Getting Demo files from URL using wp_remote_get
+            // Get demo metadata from transient cache first, falling back to remote API
+            $plugin_manager = Ansar_Plugin_Manager::instance();
+            $theme_data_api = $plugin_manager->fetch_demo_data( $theme_id );
+            if ( is_wp_error( $theme_data_api ) ) {
+                // translators: %s: Error message returned by the demo server request.
+                wp_send_json_error(array('status' => 'error', 'msg' => sprintf(__('Failed to connect to demo server: %s', 'ansar-import'), $theme_data_api->get_error_message())));
+                return;
+            }
+
+            if ( empty($theme_data_api) || !is_array($theme_data_api) ) {
+                wp_send_json_error(array('status' => 'error', 'msg' => __('Invalid response received from demo server.', 'ansar-import')));
+                return;
+            }
+
+            if ( ! is_dir( $upload_dir ) ) {
+                wp_mkdir_p( $upload_dir );
+            }
+
+            // 1. Download demo content (data.xml) with CDN mirror failover
             if ( $content !== 'false' ) {
-                $response = wp_remote_get( esc_url_raw( $theme_data_api['data_file_url'] ), array( 'timeout' => 30 ) );
-                if ( ! is_wp_error( $response ) ) {
-                    $body = wp_remote_retrieve_body( $response );
-                    if ( ! empty( $body ) ) {
-                        file_put_contents( trailingslashit( $upload['basedir'] ) . 'ansar_import_data/data.xml', $body );
-                    }
+                if ( empty( $theme_data_api['data_file_url'] ) ) {
+                    wp_send_json_error(array('status' => 'error', 'msg' => __('Demo content file URL is missing on the server.', 'ansar-import')));
+                    return;
+                }
+
+                $body = $this->download_demo_file_with_fallback( $theme_data_api['data_file_url'], 60 );
+                if ( is_wp_error( $body ) ) {
+                    // translators: %s: Error message returned when downloading demo content fails.
+                    wp_send_json_error(array('status' => 'error', 'msg' => sprintf(__('Failed to download demo content: %s', 'ansar-import'), $body->get_error_message())));
+                    return;
+                }
+
+                $saved = file_put_contents( trailingslashit( $upload_dir ) . 'data.xml', $body );
+                if ( false === $saved || ! file_exists( trailingslashit( $upload_dir ) . 'data.xml' ) ) {
+                    wp_send_json_error(array('status' => 'error', 'msg' => __('Could not save data.xml to uploads folder. Please check directory permissions.', 'ansar-import')));
+                    return;
                 }
             }
 
-            if ( $widget !== 'false' ) {
-                $response = wp_remote_get( esc_url_raw( $theme_data_api['widget_file_url'] ), array( 'timeout' => 30 ) );
-                if ( ! is_wp_error( $response ) ) {
-                    $body = wp_remote_retrieve_body( $response );
-                    if ( ! empty( $body ) ) {
-                        file_put_contents( trailingslashit( $upload['basedir'] ) . 'ansar_import_data/widgets.wie', $body );
-                    }
+            // 2. Download widgets with CDN mirror failover
+            if ( $widget !== 'false' && ! empty( $theme_data_api['widget_file_url'] ) ) {
+                $body = $this->download_demo_file_with_fallback( $theme_data_api['widget_file_url'], 30 );
+                if ( ! is_wp_error( $body ) && ! empty( $body ) ) {
+                    file_put_contents( trailingslashit( $upload_dir ) . 'widgets.wie', $body );
                 }
             }
 
-            if ( $customize !== 'false' ) {
-                $response = wp_remote_get( esc_url_raw( $theme_data_api['customizer_file_url'] ), array( 'timeout' => 30 ) );
-                if ( ! is_wp_error( $response ) ) {
-                    $body = wp_remote_retrieve_body( $response );
-                    if ( ! empty( $body ) ) {
-                        file_put_contents( trailingslashit( $upload['basedir'] ) . 'ansar_import_data/customizer.dat', $body );
-                    }
+            // 3. Download customizer settings with CDN mirror failover
+            if ( $customize !== 'false' && ! empty( $theme_data_api['customizer_file_url'] ) ) {
+                $body = $this->download_demo_file_with_fallback( $theme_data_api['customizer_file_url'], 30 );
+                if ( ! is_wp_error( $body ) && ! empty( $body ) ) {
+                    file_put_contents( trailingslashit( $upload_dir ) . 'customizer.dat', $body );
                 }
             }
 
-            //remove current home page if exsist
+            // Remove existing front page if present
             $home_d = get_posts(
                 array(
                     'post_type'      => 'page',
@@ -329,60 +477,88 @@ class Ansar_Import {
                     'numberposts'    => 1,
                 )
             );
-            
             if (!empty($home_d)) {
                 $home_id = $home_d[0]->ID;
                 wp_delete_post($home_id, true);
             }
-            wp_send_json_success(['status' => 'ok', 'msg' => 'Demo Data Files Imported Successfully']);
+
+            wp_send_json_success(['status' => 'ok', 'msg' => 'Demo Data Files Downloaded and Initialized Successfully']);
+            return;
         }
         
         if($step == 'demo_data_import'){
-            $data_file = $upload['basedir'] . '/ansar_import_data/data.xml';
-            $wiget_file = $upload['basedir'] . '/ansar_import_data/widgets.wie';
-            $customizer_file = $upload['basedir'] . '/ansar_import_data/customizer.dat';
+            $data_file = trailingslashit( $upload_dir ) . 'data.xml';
+            $wiget_file = trailingslashit( $upload_dir ) . 'widgets.wie';
+            $customizer_file = trailingslashit( $upload_dir ) . 'customizer.dat';
 
-            // Suppress all output
+            // Auto-recovery: If data.xml is somehow missing, try re-downloading on-the-fly
+            if ($content !== 'false' && !file_exists($data_file)) {
+                if (!empty($theme_id)) {
+                    $theme_data_api = Ansar_Plugin_Manager::instance()->fetch_demo_data( $theme_id );
+                    if ( is_array( $theme_data_api ) && ! empty( $theme_data_api['data_file_url'] ) ) {
+                        $body = $this->download_demo_file_with_fallback( $theme_data_api['data_file_url'], 60 );
+                        if ( ! is_wp_error( $body ) && ! empty( $body ) ) {
+                            file_put_contents( $data_file, $body );
+                        }
+                    }
+                }
+            }
+
+            if ($content !== 'false' && !file_exists($data_file)) {
+                wp_send_json_error(array('status' => 'error', 'msg' => __('Demo content file (data.xml) could not be found. Please try again.', 'ansar-import')));
+                return;
+            }
+
+            // Suppress all output from WordPress Importer
             ob_start();
 
-            if ($content !== 'false') {
-                if (!file_exists($data_file)) {
-                    wp_send_json_error('Content Demo Data Import file could not be found.');
-                } else {
-                    $import = new ANS_WP_Import();
-                    $import->dispatch(); // Make sure this doesn't echo anything
-                }
-            }
-
-            if ($widget !== 'false') {
-                if (!file_exists($wiget_file)) {
-                    wp_send_json_error('Widget Demo Data Import file could not be found.');
-                } else {
-                    $sidebars_widgets = wp_get_sidebars_widgets();
-                    foreach ($sidebars_widgets as $key => $widgets) {
-                        $sidebars_widgets[$key] = array();
+            try {
+                if ($content !== 'false' && file_exists($data_file)) {
+                    if ( ! class_exists( 'ANSAR_IMPORT_WXR_Parser' ) ) {
+                        require_once ANSAR_IMPORT_DIR_PATH . 'includes/parsers.php';
                     }
-                    wp_set_sidebars_widgets($sidebars_widgets);
-                    $ansar_importer = new Ansar_Import();
-                    $wie_import_results = $ansar_importer->wie_import_data($wiget_file);
+                    if ( ! class_exists( 'WP_Importer' ) ) {
+                        $class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
+                        if ( file_exists( $class_wp_importer ) ) {
+                            require_once $class_wp_importer;
+                        }
+                    }
+                    if ( ! class_exists( 'ANSAR_IMPORT_WP_Import' ) ) {
+                        require_once ANSAR_IMPORT_DIR_PATH . 'includes/class-wp-import.php';
+                    }
+                    $import = new ANSAR_IMPORT_WP_Import();
+                    $import->dispatch();
                 }
+
+                if ($widget !== 'false' && file_exists($wiget_file)) {
+                    $sidebars_widgets = get_option( 'sidebars_widgets', array() );
+                    if (is_array($sidebars_widgets)) {
+                        foreach ($sidebars_widgets as $key => $widgets) {
+                            $sidebars_widgets[$key] = array();
+                        }
+                        wp_set_sidebars_widgets($sidebars_widgets);
+                    }
+                    $this->ansar_import_wie_import_data($wiget_file);
+                }
+
+                if ($customize !== 'false' && file_exists($customizer_file)) {
+                    $this->ans_import_customizer_settings($customizer_file);
+                }
+            } catch (Exception $e) {
+                unset( $e );
+            } catch (Throwable $t) {
+                unset( $t );
             }
 
-            if ($customize !== 'false') {
-                if (!file_exists($customizer_file)) {
-                    wp_send_json_error('Customizer Demo Data file could not be found.');
-                } else {
-                    $ansar_importer = new Ansar_Import();
-                    $ansar_importer->ans_import_customizer_settings($customizer_file);
-                }
+            if (ob_get_length()) {
+                ob_end_clean();
             }
-
-            ob_end_clean(); // Discard any buffer output
 
             wp_send_json_success([
                 'status' => 'ok',
                 'msg' => 'Theme Demo Data Imported Successfully'
             ]);
+            return;
         }
     }
 
@@ -398,25 +574,20 @@ class Ansar_Import {
         $plugin_admin = new Ansar_Import_Admin($this->get_plugin_name(), $this->get_version());
         $this->loader->add_action('wp_ajax_import_action', $plugin_admin, 'import_data_ajax');
         $this->loader->add_action('admin_menu', $plugin_admin, 'register_theme_page');
+        $this->loader->add_action('admin_menu', $plugin_admin, 'override_theme_starter_sites_submenu', 999);
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+        $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'cleanup_legacy_theme_enqueues', 10000);
+        $this->loader->add_action('enqueue_block_editor_assets', $plugin_admin, 'enqueue_block_editor_assets');
+        $this->loader->add_action('wp_ajax_ansar_template_library_prepare_plugin', $plugin_admin, 'template_library_prepare_plugin_ajax');
         $this->loader->add_action('wp_ajax_infinity_load_demos', $plugin_admin, 'infinity_load_demos');
-        $this->loader->add_action('wp_ajax_nopriv_infinity_load_demos', $plugin_admin, 'infinity_load_demos');
-    }
-
-    /**
-     * Register all of the hooks related to the public-facing functionality
-     * of the plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     */
-    private function define_public_hooks() {
-
-        $plugin_public = new Ansar_Import_Public($this->get_plugin_name(), $this->get_version());
-
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+        $this->loader->add_action('wp_ajax_ansar_save_preferred_editor', $plugin_admin, 'save_preferred_editor_ajax');
+        $this->loader->add_action('wp_ajax_ansar_get_demo_plugins_status', $plugin_admin, 'get_demo_plugins_status_ajax');
+        $this->loader->add_action('wp_ajax_ansar_dismiss_hero', $plugin_admin, 'dismiss_hero_ajax');
+        $this->loader->add_action('admin_init', $plugin_admin, 'handle_activation_redirect', 1);
+        $this->loader->add_action('admin_footer', $plugin_admin, 'override_theme_get_started_links');
+        $this->loader->add_action('after_switch_theme', $plugin_admin, 'on_theme_switched');
+        $this->loader->add_action('ansar_import_render_starter_sites', $plugin_admin, 'render_starter_sites_component', 10, 1);
     }
 
     /**
@@ -459,7 +630,7 @@ class Ansar_Import {
         return $this->version;
     }
 
-    public function wie_available_widgets() {
+    public function ansar_import_wie_available_widgets() {
 
         global $wp_registered_widget_controls;
 
@@ -476,7 +647,7 @@ class Ansar_Import {
             }
         }
 
-        return apply_filters('wie_available_widgets', $available_widgets);
+        return apply_filters('ansar_import_wie_available_widgets', $available_widgets);
     }
 
     /**
@@ -487,7 +658,7 @@ class Ansar_Import {
      * @param object $data JSON widget data from .wie file.
      * @return array Results array
      */
-    public function wie_import_data($file) {
+    public function ansar_import_wie_import_data($file) {
 
         global $wp_registered_sidebars;
 
@@ -497,20 +668,15 @@ class Ansar_Import {
         // Have valid data?
         // If no data or could not decode.
         if (empty($data) || !is_object($data)) {
-
-            wp_die(
-                    esc_html__('Import data could not be read. Please try a different file.', 'ansar-import'), '', array(
-                'back_link' => true,
-                    )
-            );
+            return false;
         }
 
         // Hook before import.
-        do_action('wie_before_import');
-        $data = apply_filters('wie_import_data', $data);
+        do_action('ansar_import_wie_before_import');
+        $data = apply_filters('ansar_import_wie_import_data', $data);
 
         // Get all available widgets site supports.
-        $available_widgets = $this->wie_available_widgets();
+        $available_widgets = $this->ansar_import_wie_available_widgets();
 
         // Get all existing widget instances.
         $widget_instances = array();
@@ -568,8 +734,8 @@ class Ansar_Import {
 
                 // Filter to modify settings object before conversion to array and import
                 // Leave this filter here for backwards compatibility with manipulating objects (before conversion to array below)
-                // Ideally the newer wie_widget_settings_array below will be used instead of this.
-                $widget = apply_filters('wie_widget_settings', $widget);
+                // Ideally the newer ansar_import_wie_widget_settings_array below will be used instead of this.
+                $widget = apply_filters('ansar_import_wie_widget_settings', $widget);
 
                 // Convert multidimensional objects to multidimensional arrays
                 // Some plugins like Jetpack Widget Visibility store settings as multidimensional arrays
@@ -579,9 +745,9 @@ class Ansar_Import {
                 $widget = json_decode(wp_json_encode($widget), true);
 
                 // Filter to modify settings array
-                // This is preferred over the older wie_widget_settings filter above
+                // This is preferred over the older ansar_import_wie_widget_settings filter above
                 // Do before identical check because changes may make it identical to end result (such as URL replacements).
-                $widget = apply_filters('wie_widget_settings_array', $widget);
+                $widget = apply_filters('ansar_import_wie_widget_settings_array', $widget);
 
                 // Does widget with identical settings already exist in same sidebar?
                 if (!$fail && isset($widget_instances[$id_base])) {
@@ -669,7 +835,7 @@ class Ansar_Import {
                         'widget_id_num' => $new_instance_id_number,
                         'widget_id_num_old' => $instance_id_number,
                     );
-                    do_action('wie_after_widget_import', $after_widget_import);
+                    do_action('ansar_import_wie_after_widget_import', $after_widget_import);
 
                     // Success message.
                     if ($sidebar_available) {
@@ -690,10 +856,10 @@ class Ansar_Import {
         }
 
         // Hook after import.
-        do_action('wie_after_import');
+        do_action('ansar_import_wie_after_import');
 
         // Return results.
-        return apply_filters('wie_import_results', $results);
+        return apply_filters('ansar_import_wie_import_results', $results);
     }
 
     function ans_import_customizer_settings($custom_file) {
@@ -788,3 +954,53 @@ class Ansar_Import {
     }
 
 }
+
+if ( ! function_exists( 'ansar_import_get_theme_demos_url' ) ) {
+    /**
+     * Reusable helper function for Theme Ansar themes and child themes.
+     * Returns the direct URL to the Theme Demos page with the Onboarding Wizard open.
+     *
+     * @param bool $onboarding Whether to force-launch the Onboarding wizard modal (default: true).
+     * @return string Admin URL to Theme Demos.
+     */
+    function ansar_import_get_theme_demos_url( $onboarding = true ) {
+        return add_query_arg(
+            array(
+                'page'       => 'ansar-demo-import',
+                'onboarding' => $onboarding ? 'true' : 'false',
+            ),
+            admin_url( 'admin.php' )
+        );
+    }
+}
+
+if ( ! function_exists( 'ansar_import_get_starter_sites_url' ) ) {
+    /**
+     * Reusable helper function for Starter Sites page.
+     *
+     * @param bool $onboarding Whether to force-launch the Onboarding wizard modal (default: true).
+     * @return string Admin URL to starter sites.
+     */
+    function ansar_import_get_starter_sites_url( $onboarding = true ) {
+        return add_query_arg(
+            array(
+                'page'       => 'ansar-starter-sites',
+                'onboarding' => $onboarding ? 'true' : 'false',
+            ),
+            admin_url( 'admin.php' )
+        );
+    }
+}
+
+if ( ! function_exists( 'ansar_import_render_starter_sites' ) ) {
+    /**
+     * Reusable helper function to render the Ansar Starter Sites UI inside any theme dashboard or admin page.
+     * Automatically enqueues required styles, scripts, and localized demo data.
+     *
+     * @param array $args Optional configuration arguments (e.g. 'context', 'show_header', 'show_hero').
+     */
+    function ansar_import_render_starter_sites( $args = array() ) {
+        do_action( 'ansar_import_render_starter_sites', $args );
+    }
+}
+

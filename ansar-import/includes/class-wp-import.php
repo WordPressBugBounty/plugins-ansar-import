@@ -9,7 +9,7 @@
 /**
  * WordPress importer class.
  */
-class ANS_WP_Import extends WP_Importer {
+class ANSAR_IMPORT_WP_Import extends WP_Importer {
 
     var $max_wxr_version = 1.2; // max. supported WXR version
     var $id; // WXR attachment ID
@@ -48,7 +48,10 @@ class ANS_WP_Import extends WP_Importer {
         $this->fetch_attachments = 1;
         $this->id = 10;
         $file = $data_file;
-        set_time_limit(0);
+        if ( function_exists( 'set_time_limit' ) ) {
+            // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged, WordPress.PHP.NoSilencedErrors.Discouraged -- Extended execution time needed for WXR import.
+            @set_time_limit( 0 );
+        }
         $this->import($data_file);
         $this->footer();
     }
@@ -59,10 +62,10 @@ class ANS_WP_Import extends WP_Importer {
      * @param string $file Path to the WXR file for importing
      */
     function import($file) {
-        add_filter('import_post_meta_key', array($this, 'is_valid_meta_key'));
+        add_filter('ansar_import_post_meta_key', array($this, 'is_valid_meta_key'));
         add_filter('http_request_timeout', array(&$this, 'bump_request_timeout'));
 
-        $this->import_start($file);
+        $this->ansar_import_start($file);
 
         //$this->get_author_mapping();
 
@@ -78,7 +81,7 @@ class ANS_WP_Import extends WP_Importer {
         $this->backfill_attachment_urls();
         $this->remap_featured_images();
 
-        $this->import_end();
+        $this->ansar_import_end();
     }
 
     /**
@@ -86,7 +89,7 @@ class ANS_WP_Import extends WP_Importer {
      *
      * @param string $file Path to the WXR file for importing
      */
-    function import_start($file) {
+    function ansar_import_start($file) {
         if (!is_file($file)) {
             echo '<p><strong>' . esc_html__('Sorry, there has been an error.', 'ansar-import') . '</strong><br />';
             echo esc_html__('The file does not exist, please try again.', 'ansar-import') . '</p>';
@@ -114,13 +117,13 @@ class ANS_WP_Import extends WP_Importer {
         wp_defer_term_counting(true);
         wp_defer_comment_counting(true);
 
-        do_action('import_start');
+        do_action('ansar_import_start');
     }
 
     /**
      * Performs post-import cleanup of files and the cache
      */
-    function import_end() {
+    function ansar_import_end() {
         wp_import_cleanup($this->id);
 
         wp_cache_flush();
@@ -135,7 +138,7 @@ class ANS_WP_Import extends WP_Importer {
         echo '<p>' . esc_html__('All done.', 'ansar-import') . ' <a href="' . esc_url(admin_url()) . '">' . esc_html__('Have fun!', 'ansar-import') . '</a>' . '</p>';
         echo '<p>' . esc_html__('Remember to update the passwords and roles of imported users.', 'ansar-import') . '</p>';
 
-        do_action('import_end');
+        do_action('ansar_import_end');
     }
 
     /**
@@ -513,7 +516,7 @@ class ANS_WP_Import extends WP_Importer {
              * @param int    $term_id  ID of the newly created term.
              * @param array  $term     Term data from the WXR import.
              */
-            $key = apply_filters('import_term_meta_key', $meta['key'], $term_id, $term);
+            $key = apply_filters('ansar_import_term_meta_key', $meta['key'], $term_id, $term);
             if (!$key) {
                 continue;
             }
@@ -532,7 +535,7 @@ class ANS_WP_Import extends WP_Importer {
              * @param string $key     Meta key.
              * @param mixed  $value   Meta value.
              */
-            do_action('import_term_meta', $term_id, $key, $value);
+            do_action('ansar_import_term_meta', $term_id, $key, $value);
         }
     }
 
@@ -767,7 +770,7 @@ class ANS_WP_Import extends WP_Importer {
             // add/update post meta
             if (!empty($post['postmeta'])) {
                 foreach ($post['postmeta'] as $meta) {
-                    $key = apply_filters('import_post_meta_key', $meta['key'], $post_id, $post);
+                    $key = apply_filters('ansar_import_post_meta_key', $meta['key'], $post_id, $post);
                     $value = false;
 
                     if ('_edit_last' == $key) {
@@ -785,7 +788,7 @@ class ANS_WP_Import extends WP_Importer {
 
                         add_post_meta($post_id, wp_slash($key), wp_slash_strings_only($value));
 
-                        do_action('import_post_meta', $post_id, $key, $value);
+                        do_action('ansar_import_post_meta', $post_id, $key, $value);
 
                         // if the post has a featured image, take note of this in case of remap
                         if ('_thumbnail_id' == $key)
@@ -939,8 +942,15 @@ class ANS_WP_Import extends WP_Importer {
      * @return array|WP_Error Local file location details on success, WP_Error otherwise
      */
     function fetch_remote_file($url, $post) {
+        if ( class_exists( 'Ansar_Import' ) && method_exists( 'Ansar_Import', 'get_demo_file_candidate_urls' ) ) {
+            $candidates = Ansar_Import::get_demo_file_candidate_urls( $url );
+            if ( ! empty( $candidates[0] ) ) {
+                $url = $candidates[0];
+            }
+        }
+
         // Extract the file name from the URL.
-        $file_name = basename(parse_url($url, PHP_URL_PATH));
+        $file_name = basename(wp_parse_url($url, PHP_URL_PATH));
 
         if (!$file_name) {
             $file_name = md5($url);
@@ -962,7 +972,7 @@ class ANS_WP_Import extends WP_Importer {
         ));
 
         if (is_wp_error($remote_response)) {
-            @unlink($tmp_file_name);
+            wp_delete_file($tmp_file_name);
             return new WP_Error(
                     'import_file_error', sprintf(
                             /* translators: 1: The WordPress error message. 2: The WordPress error code. */
@@ -974,8 +984,8 @@ class ANS_WP_Import extends WP_Importer {
         $remote_response_code = (int) wp_remote_retrieve_response_code($remote_response);
 
         // Make sure the fetch was successful.
-        if (200 !== $remote_response_code) {
-            @unlink($tmp_file_name);
+        if (200 !== $remote_response_code) { 
+            wp_delete_file($tmp_file_name);
             return new WP_Error(
                     'import_file_error', sprintf(
                             /* translators: 1: The HTTP error message. 2: The HTTP error code. */
@@ -988,25 +998,25 @@ class ANS_WP_Import extends WP_Importer {
 
         // Request failed.
         if (!$headers) {
-            @unlink($tmp_file_name);
+            wp_delete_file($tmp_file_name);
             return new WP_Error('import_file_error', __('Remote server did not respond', 'ansar-import'));
         }
 
         $filesize = (int) filesize($tmp_file_name);
 
         if (0 === $filesize) {
-            @unlink($tmp_file_name);
+            wp_delete_file($tmp_file_name);
             return new WP_Error('import_file_error', __('Zero size file downloaded', 'ansar-import'));
         }
 
         if (!isset($headers['content-encoding']) && isset($headers['content-length']) && $filesize !== (int) $headers['content-length']) {
-            @unlink($tmp_file_name);
+            wp_delete_file($tmp_file_name);
             return new WP_Error('import_file_error', __('Downloaded file has incorrect size', 'ansar-import'));
         }
 
         $max_size = (int) $this->max_attachment_size();
         if (!empty($max_size) && $filesize > $max_size) {
-            @unlink($tmp_file_name);
+            wp_delete_file($tmp_file_name);
             // Translators: %s is the maximum allowed size for the remote file.
             return new WP_Error('import_file_error', sprintf(esc_html__('Remote file is too large, limit is %s', 'ansar-import'), size_format($max_size)));
         }
@@ -1054,14 +1064,21 @@ class ANS_WP_Import extends WP_Importer {
         $move_new_file = copy($tmp_file_name, $new_file);
 
         if (!$move_new_file) {
-            @unlink($tmp_file_name);
+            wp_delete_file($tmp_file_name);
             return new WP_Error('import_file_error', __('The uploaded file could not be moved', 'ansar-import'));
         }
 
-        // Set correct file permissions.
+        // Set correct file permissions using WP_Filesystem.
+        global $wp_filesystem;
+        if ( empty( $wp_filesystem ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
+        }
         $stat = stat(dirname($new_file));
         $perms = $stat['mode'] & 0000666;
-        chmod($new_file, $perms);
+        if ( $wp_filesystem ) {
+            $wp_filesystem->chmod($new_file, $perms);
+        }
 
         $upload = array(
             'file' => $new_file,
@@ -1163,7 +1180,7 @@ class ANS_WP_Import extends WP_Importer {
      * @return array Information gathered from the WXR file
      */
     function parse($file) {
-        $parser = new ANS_WXR_Parser();
+        $parser = new ANSAR_IMPORT_WXR_Parser();
         return $parser->parse($file);
     }
 
@@ -1220,7 +1237,7 @@ class ANS_WP_Import extends WP_Importer {
      * @return bool True if creating users is allowed
      */
     function allow_create_users() {
-        return apply_filters('import_allow_create_users', true);
+        return apply_filters('ansar_import_allow_create_users', true);
     }
 
     /**
@@ -1231,7 +1248,7 @@ class ANS_WP_Import extends WP_Importer {
      * @return bool True if downloading attachments is allowed
      */
     function allow_fetch_attachments() {
-        return apply_filters('import_allow_fetch_attachments', true);
+        return apply_filters('ansar_import_allow_fetch_attachments', true);
     }
 
     /**
@@ -1241,7 +1258,7 @@ class ANS_WP_Import extends WP_Importer {
      * @return int Maximum attachment file size to import
      */
     function max_attachment_size() {
-        return apply_filters('import_attachment_size_limit', 0);
+        return apply_filters('ansar_import_attachment_size_limit', 0);
     }
 
     /**

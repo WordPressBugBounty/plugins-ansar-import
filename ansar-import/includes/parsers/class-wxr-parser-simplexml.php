@@ -9,7 +9,7 @@
 /**
  * WXR Parser that makes use of the SimpleXML PHP extension.
  */
-class ANS_WXR_Parser_SimpleXML {
+class ANSAR_IMPORT_WXR_Parser_SimpleXML {
 	function parse( $file ) {
 		$authors = $posts = $categories = $tags = $terms = array();
 
@@ -75,7 +75,7 @@ class ANS_WXR_Parser_SimpleXML {
 		// grab cats, tags and terms
 		foreach ( $xml->xpath('/rss/channel/wp:category') as $term_arr ) {
 			$t = $term_arr->children( $namespaces['wp'] );
-			$category = array(
+			$ansar_import_category = array(
 				'term_id' => (int) $t->term_id,
 				'category_nicename' => (string) $t->category_nicename,
 				'category_parent' => (string) $t->category_parent,
@@ -84,13 +84,13 @@ class ANS_WXR_Parser_SimpleXML {
 			);
 
 			foreach ( $t->termmeta as $meta ) {
-				$category['termmeta'][] = array(
+				$ansar_import_category['termmeta'][] = array(
 					'key' => (string) $meta->meta_key,
 					'value' => (string) $meta->meta_value
 				);
 			}
 
-			$categories[] = $category;
+			$categories[] = $ansar_import_category;
 		}
 
 		foreach ( $xml->xpath('/rss/channel/wp:tag') as $term_arr ) {
